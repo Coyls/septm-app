@@ -1,12 +1,8 @@
-"use client"
+"use client";
 
-import { Suspense, useState } from "react"
-import Link from "next/link"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Eye, EyeOff, Trophy } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -14,38 +10,44 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { signInSchema, type SignInSchema } from "@/lib/schemas/auth.schema"
-import { useSignIn } from "@/lib/query/hooks/useAuth"
-import { AppError } from "@/lib/types"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { useSignIn } from "@/lib/query/hooks/useAuth";
+import { signInSchema, type SignInSchema } from "@/lib/schemas/auth.schema";
+import { AppError } from "@/lib/types";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Eye, EyeOff, Trophy } from "lucide-react";
+import Link from "next/link";
+import { Suspense, useState } from "react";
+import { useForm } from "react-hook-form";
 
 function SignInForm() {
-  const [showPassword, setShowPassword] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const { mutate: signIn, isPending } = useSignIn()
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { mutate: signIn, isPending } = useSignIn();
 
   const form = useForm<SignInSchema>({
     resolver: zodResolver(signInSchema),
     defaultValues: { email: "", password: "" },
-  })
+  });
 
   function onSubmit(data: SignInSchema) {
-    setError(null)
+    setError(null);
     signIn(data, {
       onError: (err) => {
         if (err instanceof AppError) {
           if (err.status === 429) {
-            setError("Trop de tentatives. Veuillez patienter avant de réessayer.")
+            setError(
+              "Trop de tentatives. Veuillez patienter avant de réessayer.",
+            );
           } else {
-            setError("Email ou mot de passe incorrect.")
+            setError("Email ou mot de passe incorrect.");
           }
         } else {
-          setError("Une erreur est survenue. Veuillez réessayer.")
+          setError("Une erreur est survenue. Veuillez réessayer.");
         }
       },
-    })
+    });
   }
 
   return (
@@ -75,7 +77,7 @@ function SignInForm() {
                   <FormControl>
                     <Input
                       type="email"
-                      placeholder="vous@exemple.fr"
+                      placeholder="email@example.com"
                       autoComplete="email"
                       {...field}
                     />
@@ -128,13 +130,16 @@ function SignInForm() {
 
         <p className="text-center text-sm text-muted-foreground">
           Pas de compte ?{" "}
-          <Link href="/signup" className="text-primary hover:underline font-medium">
+          <Link
+            href="/signup"
+            className="text-primary hover:underline font-medium"
+          >
             S&apos;inscrire
           </Link>
         </p>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export default function SignInPage() {
@@ -142,5 +147,5 @@ export default function SignInPage() {
     <Suspense fallback={null}>
       <SignInForm />
     </Suspense>
-  )
+  );
 }

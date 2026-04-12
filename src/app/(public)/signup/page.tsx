@@ -15,29 +15,11 @@ import { Input } from "@/components/ui/input";
 import { useSignUp } from "@/lib/query/hooks/useAuth";
 import { signUpSchema, type SignUpSchema } from "@/lib/schemas/auth.schema";
 import { AppError } from "@/lib/types";
-import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, Trophy } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-
-function getPasswordStrength(password: string): "weak" | "medium" | "strong" {
-  if (password.length < 8) return "weak";
-  const hasUpper = /[A-Z]/.test(password);
-  const hasNumber = /[0-9]/.test(password);
-  const hasSpecial = /[^A-Za-z0-9]/.test(password);
-  const score = [hasUpper, hasNumber, hasSpecial].filter(Boolean).length;
-  if (score >= 2) return "strong";
-  if (score === 1) return "medium";
-  return "weak";
-}
-
-const strengthConfig = {
-  weak: { label: "Faible", color: "bg-destructive", segments: 1 },
-  medium: { label: "Moyen", color: "bg-yellow-500", segments: 2 },
-  strong: { label: "Fort", color: "bg-[var(--success)]", segments: 3 },
-};
 
 export default function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -49,10 +31,6 @@ export default function SignUpPage() {
     resolver: zodResolver(signUpSchema),
     defaultValues: { email: "", password: "", confirmPassword: "" },
   });
-
-  const password = form.watch("password");
-  const strength = password ? getPasswordStrength(password) : null;
-  const strengthInfo = strength ? strengthConfig[strength] : null;
 
   function onSubmit(data: SignUpSchema) {
     setError(null);
@@ -99,7 +77,7 @@ export default function SignUpPage() {
                   <FormControl>
                     <Input
                       type="email"
-                      placeholder="vous@exemple.fr"
+                      placeholder="email@example.com"
                       autoComplete="email"
                       {...field}
                     />
@@ -139,27 +117,6 @@ export default function SignUpPage() {
                       </Button>
                     </div>
                   </FormControl>
-                  {/* Password strength indicator */}
-                  {strengthInfo && (
-                    <div className="space-y-1 mt-1">
-                      <div className="flex gap-1">
-                        {[1, 2, 3].map((seg) => (
-                          <div
-                            key={seg}
-                            className={cn(
-                              "h-1 flex-1 rounded-full transition-colors",
-                              seg <= strengthInfo.segments
-                                ? strengthInfo.color
-                                : "bg-muted",
-                            )}
-                          />
-                        ))}
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        Force : {strengthInfo.label}
-                      </p>
-                    </div>
-                  )}
                   <FormMessage />
                 </FormItem>
               )}
