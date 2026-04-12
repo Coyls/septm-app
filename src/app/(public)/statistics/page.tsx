@@ -1,5 +1,5 @@
-import { StatisticsContent } from "@/components/statistics/StatisticsContent"
+import { GlobalStatisticsContent } from "@/components/statistics/GlobalStatisticsContent"
 
 export default function StatisticsPage() {
-  return <StatisticsContent mode="global" />
+  return <GlobalStatisticsContent />
 }
