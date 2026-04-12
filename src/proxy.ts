@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 
-const PUBLIC_PATHS = ["/", "/signin", "/signup"];
+const PUBLIC_PATHS = ["/", "/signin", "/signup", "/statistics"];
 const AUTH_REDIRECT_PATHS = ["/signin", "/signup"];
 
 export async function proxy(request: NextRequest) {
@@ -54,9 +54,10 @@ export const config = {
     "/",
     "/signin",
     "/signup",
+    "/statistics",
     "/dashboard",
     "/game/:path*",
-    "/statistics/:path*",
+    "/statistics/me",
     "/friends",
   ],
 };

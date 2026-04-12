@@ -6,7 +6,6 @@ import {
   LayoutDashboard,
   PlusCircle,
   BarChart2,
-  User,
   Users,
   LogOut,
   Trophy,
@@ -22,8 +21,7 @@ import { useReceivedRequests } from "@/lib/query/hooks/useFriends"
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/game/new", label: "Nouvelle partie", icon: PlusCircle, accent: true },
-  { href: "/statistics", label: "Statistiques", icon: BarChart2 },
-  { href: "/statistics/me", label: "Mes statistiques", icon: User },
+  { href: "/statistics/me", label: "Statistiques", icon: BarChart2 },
 ]
 
 export function Sidebar({ className }: { className?: string }) {

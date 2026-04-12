@@ -1,14 +1,9 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import dynamic from "next/dynamic"
-import {
-  Trophy,
-  BarChart2,
-  TrendingUp,
-  Star,
-} from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { DateRangePicker } from "@/components/statistics/DateRangePicker";
+import { StatCard } from "@/components/statistics/StatCard";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -16,68 +11,76 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Skeleton } from "@/components/ui/skeleton"
-import { StatCard } from "@/components/statistics/StatCard"
-import { DateRangePicker } from "@/components/statistics/DateRangePicker"
-import { useGlobalStats, useMyStats } from "@/lib/query/hooks/useStatistics"
-import { POINT_TYPE_META } from "@/lib/types"
-import { formatWinRate, formatScore } from "@/lib/utils"
+} from "@/components/ui/table";
+import { useGlobalStats, useMyStats } from "@/lib/query/hooks/useStatistics";
+import { POINT_TYPE_META } from "@/lib/types";
+import { formatScore, formatWinRate } from "@/lib/utils";
+import { BarChart2, Star, TrendingUp, Trophy } from "lucide-react";
+import dynamic from "next/dynamic";
+import { useState } from "react";
 
 // Lazy load Recharts to avoid SSR hydration issues
 const ResponsiveContainer = dynamic(
   () => import("recharts").then((m) => m.ResponsiveContainer),
   { ssr: false },
-)
-const LineChart = dynamic(
-  () => import("recharts").then((m) => m.LineChart),
-  { ssr: false },
-)
-const Line = dynamic(() => import("recharts").then((m) => m.Line), { ssr: false })
-const BarChart = dynamic(
-  () => import("recharts").then((m) => m.BarChart),
-  { ssr: false },
-)
-const Bar = dynamic(() => import("recharts").then((m) => m.Bar), { ssr: false })
-const XAxis = dynamic(() => import("recharts").then((m) => m.XAxis), { ssr: false })
-const YAxis = dynamic(() => import("recharts").then((m) => m.YAxis), { ssr: false })
+);
+const LineChart = dynamic(() => import("recharts").then((m) => m.LineChart), {
+  ssr: false,
+});
+const Line = dynamic(() => import("recharts").then((m) => m.Line), {
+  ssr: false,
+});
+const BarChart = dynamic(() => import("recharts").then((m) => m.BarChart), {
+  ssr: false,
+});
+const Bar = dynamic(() => import("recharts").then((m) => m.Bar), {
+  ssr: false,
+});
+const XAxis = dynamic(() => import("recharts").then((m) => m.XAxis), {
+  ssr: false,
+});
+const YAxis = dynamic(() => import("recharts").then((m) => m.YAxis), {
+  ssr: false,
+});
 const CartesianGrid = dynamic(
   () => import("recharts").then((m) => m.CartesianGrid),
   { ssr: false },
-)
+);
 const RechartsTooltip = dynamic(
   () => import("recharts").then((m) => m.Tooltip),
   { ssr: false },
-)
-const Legend = dynamic(() => import("recharts").then((m) => m.Legend), { ssr: false })
+);
+const Legend = dynamic(() => import("recharts").then((m) => m.Legend), {
+  ssr: false,
+});
 
 interface StatisticsContentProps {
-  mode: "global" | "me"
+  mode: "global" | "me";
 }
 
 export function StatisticsContent({ mode }: StatisticsContentProps) {
-  const [dateParams, setDateParams] = useState<{ from?: string; to?: string }>({})
-  const globalStats = useGlobalStats(dateParams)
-  const meStats = useMyStats(dateParams)
+  const [dateParams, setDateParams] = useState<{ from?: string; to?: string }>(
+    {},
+  );
+  const globalStats = useGlobalStats(dateParams);
+  const meStats = useMyStats(dateParams);
 
-  const query = mode === "global" ? globalStats : meStats
-  const { data, isLoading } = query
+  const query = mode === "global" ? globalStats : meStats;
+  const { data, isLoading } = query;
 
   function SectionSkeleton() {
-    return <Skeleton className="h-64 w-full rounded-lg" />
+    return <Skeleton className="h-64 w-full rounded-lg" />;
   }
 
   // Best wonder highlights for "me" mode
-  const mostPlayedWonder =
-    data?.wonderPerformance.reduce(
-      (a, b) => (b.games > a.games ? b : a),
-      data.wonderPerformance[0],
-    )
-  const bestWinRateWonder =
-    data?.wonderPerformance.reduce(
-      (a, b) => (b.winRate > a.winRate ? b : a),
-      data.wonderPerformance[0],
-    )
+  const mostPlayedWonder = data?.wonderPerformance.reduce(
+    (a, b) => (b.games > a.games ? b : a),
+    data.wonderPerformance[0],
+  );
+  const bestWinRateWonder = data?.wonderPerformance.reduce(
+    (a, b) => (b.winRate > a.winRate ? b : a),
+    data.wonderPerformance[0],
+  );
 
   return (
     <div className="space-y-8 max-w-5xl">
@@ -96,7 +99,9 @@ export function StatisticsContent({ mode }: StatisticsContentProps) {
               <CardContent className="flex items-center gap-4 pt-4">
                 <Star className="h-8 w-8 text-primary shrink-0" />
                 <div>
-                  <p className="text-xs text-muted-foreground">Merveille la plus jouée</p>
+                  <p className="text-xs text-muted-foreground">
+                    Merveille la plus jouée
+                  </p>
                   <p className="font-bold">{mostPlayedWonder.wonderId}</p>
                   <p className="text-xs text-muted-foreground">
                     {mostPlayedWonder.games} parties
@@ -110,7 +115,9 @@ export function StatisticsContent({ mode }: StatisticsContentProps) {
               <CardContent className="flex items-center gap-4 pt-4">
                 <Trophy className="h-8 w-8 text-primary shrink-0" />
                 <div>
-                  <p className="text-xs text-muted-foreground">Meilleur taux de victoire</p>
+                  <p className="text-xs text-muted-foreground">
+                    Meilleur taux de victoire
+                  </p>
                   <p className="font-bold">{bestWinRateWonder.wonderId}</p>
                   <p className="text-xs text-muted-foreground">
                     {formatWinRate(bestWinRateWonder.winRate)}
@@ -197,7 +204,11 @@ export function StatisticsContent({ mode }: StatisticsContentProps) {
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                 <XAxis dataKey="month" tick={{ fontSize: 11 }} />
                 <YAxis yAxisId="left" tick={{ fontSize: 11 }} />
-                <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 11 }} />
+                <YAxis
+                  yAxisId="right"
+                  orientation="right"
+                  tick={{ fontSize: 11 }}
+                />
                 <RechartsTooltip
                   contentStyle={{
                     background: "var(--card)",
@@ -251,7 +262,12 @@ export function StatisticsContent({ mode }: StatisticsContentProps) {
                     border: "1px solid var(--border)",
                   }}
                 />
-                <Bar dataKey="count" name="Parties" fill="var(--chart-1)" radius={[4, 4, 0, 0]} />
+                <Bar
+                  dataKey="count"
+                  name="Parties"
+                  fill="var(--chart-1)"
+                  radius={[4, 4, 0, 0]}
+                />
               </BarChart>
             </ResponsiveContainer>
           )}
@@ -283,7 +299,9 @@ export function StatisticsContent({ mode }: StatisticsContentProps) {
                   .sort((a, b) => b.winRate - a.winRate)
                   .map((w) => (
                     <TableRow key={w.wonderId}>
-                      <TableCell className="font-medium">{w.wonderId}</TableCell>
+                      <TableCell className="font-medium">
+                        {w.wonderId}
+                      </TableCell>
                       <TableCell className="text-right">{w.games}</TableCell>
                       <TableCell className="text-right">
                         {formatScore(Math.round(w.averageScore))}
@@ -322,8 +340,18 @@ export function StatisticsContent({ mode }: StatisticsContentProps) {
                   }}
                 />
                 <Legend />
-                <Bar dataKey="winRate" name="Winrate (%)" fill="var(--chart-1)" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="averageScore" name="Score moyen" fill="var(--chart-2)" radius={[4, 4, 0, 0]} />
+                <Bar
+                  dataKey="winRate"
+                  name="Winrate (%)"
+                  fill="var(--chart-1)"
+                  radius={[4, 4, 0, 0]}
+                />
+                <Bar
+                  dataKey="averageScore"
+                  name="Score moyen"
+                  fill="var(--chart-2)"
+                  radius={[4, 4, 0, 0]}
+                />
               </BarChart>
             </ResponsiveContainer>
           )}
@@ -352,14 +380,24 @@ export function StatisticsContent({ mode }: StatisticsContentProps) {
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                 <XAxis type="number" tick={{ fontSize: 11 }} />
-                <YAxis type="category" dataKey="label" tick={{ fontSize: 11 }} width={100} />
+                <YAxis
+                  type="category"
+                  dataKey="label"
+                  tick={{ fontSize: 11 }}
+                  width={100}
+                />
                 <RechartsTooltip
                   contentStyle={{
                     background: "var(--card)",
                     border: "1px solid var(--border)",
                   }}
                 />
-                <Bar dataKey="totalPoints" name="Points totaux" fill="var(--chart-3)" radius={[0, 4, 4, 0]} />
+                <Bar
+                  dataKey="totalPoints"
+                  name="Points totaux"
+                  fill="var(--chart-3)"
+                  radius={[0, 4, 4, 0]}
+                />
               </BarChart>
             </ResponsiveContainer>
           )}
@@ -382,14 +420,18 @@ export function StatisticsContent({ mode }: StatisticsContentProps) {
                 <TableRow>
                   <TableHead>Extension</TableHead>
                   <TableHead className="text-right">Parties</TableHead>
-                  <TableHead className="text-right">Score moy. / joueur</TableHead>
+                  <TableHead className="text-right">
+                    Score moy. / joueur
+                  </TableHead>
                   <TableHead className="text-right">Nb gagnants moy.</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {data.extensionImpact.map((e) => (
                   <TableRow key={e.extensionId}>
-                    <TableCell className="font-medium">{e.extensionId}</TableCell>
+                    <TableCell className="font-medium">
+                      {e.extensionId}
+                    </TableCell>
                     <TableCell className="text-right">{e.games}</TableCell>
                     <TableCell className="text-right">
                       {formatScore(Math.round(e.averageScorePerPlayer))}
@@ -435,12 +477,17 @@ export function StatisticsContent({ mode }: StatisticsContentProps) {
                     border: "1px solid var(--border)",
                   }}
                 />
-                <Bar dataKey="count" name="Parties" fill="var(--chart-4)" radius={[4, 4, 0, 0]} />
+                <Bar
+                  dataKey="count"
+                  name="Parties"
+                  fill="var(--chart-4)"
+                  radius={[4, 4, 0, 0]}
+                />
               </BarChart>
             </ResponsiveContainer>
           )}
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

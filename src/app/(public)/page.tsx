@@ -25,6 +25,9 @@ export default function LandingPage() {
           <Link href="/signin" className={buttonVariants({ variant: "outline", size: "lg" })}>
             Se connecter
           </Link>
+          <Link href="/statistics" className={buttonVariants({ variant: "ghost", size: "lg" })}>
+            Statistiques globales
+          </Link>
         </div>
       </section>
 
