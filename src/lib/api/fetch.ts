@@ -20,7 +20,7 @@ async function doRefresh(): Promise<boolean> {
 
 function redirectToSignIn(): never {
   if (typeof window !== "undefined") {
-    window.location.href = "/signin";
+    window.location.href = "/auth/signin";
   }
   throw new AppError("UNAUTHORIZED", 401, "Non authentifié");
 }

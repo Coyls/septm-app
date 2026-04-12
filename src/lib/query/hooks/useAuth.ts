@@ -52,7 +52,7 @@ export function useSignOut() {
       clearToken();
       resetWizard();
       queryClient.clear();
-      router.push("/signin");
+      router.push("/auth/signin");
     },
   });
 }

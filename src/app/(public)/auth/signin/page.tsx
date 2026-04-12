@@ -131,7 +131,7 @@ function SignInForm() {
         <p className="text-center text-sm text-muted-foreground">
           Pas de compte ?{" "}
           <Link
-            href="/signup"
+            href="/auth/signup"
             className="text-primary hover:underline font-medium"
           >
             S&apos;inscrire

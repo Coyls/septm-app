@@ -169,10 +169,10 @@ export default function LandingPage() {
 
           {/* CTAs */}
           <div className="fade-up d4" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-            <Link href="/signup" className={cn(buttonVariants({ size: "lg" }), "cta-primary")}>
+            <Link href="/auth/signup" className={cn(buttonVariants({ size: "lg" }), "cta-primary")}>
               COMMENCER
             </Link>
-            <Link href="/signin" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "cta-secondary")}>
+            <Link href="/auth/signin" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "cta-secondary")}>
               SE CONNECTER
             </Link>
             <Link
@@ -278,7 +278,7 @@ export default function LandingPage() {
         <div className="fade-in d7" style={{ textAlign: 'center', paddingBottom: '16px' }}>
           <p style={{ fontSize: '13px', color: 'var(--muted-foreground)', letterSpacing: '0.01em' }}>
             Déjà un compte ?{' '}
-            <Link href="/signin" style={{ color: 'var(--primary)', fontWeight: 500 }} className="hover:underline">
+            <Link href="/auth/signin" style={{ color: 'var(--primary)', fontWeight: 500 }} className="hover:underline">
               Se connecter
             </Link>
           </p>
