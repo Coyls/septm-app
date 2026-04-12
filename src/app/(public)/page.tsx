@@ -42,11 +42,11 @@ export default function LandingPage() {
           position: absolute;
           inset: 0;
           border-radius: inherit;
-          background: linear-gradient(135deg, rgba(230,168,23,0.04) 0%, transparent 60%);
+          background: linear-gradient(135deg, rgba(198,161,91,0.04) 0%, transparent 60%);
           pointer-events: none;
         }
         .feat-card:hover {
-          border-color: rgba(230,168,23,0.3);
+          border-color: rgba(198,161,91,0.3);
           transform: translateY(-2px);
         }
         .feat-card::before {
@@ -54,7 +54,7 @@ export default function LandingPage() {
           position: absolute;
           top: 0; left: 10%; right: 10%;
           height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(230,168,23,0.5), transparent);
+          background: linear-gradient(90deg, transparent, rgba(198,161,91,0.5), transparent);
         }
 
         .grain-overlay {
@@ -246,8 +246,8 @@ export default function LandingPage() {
                   width: '38px',
                   height: '38px',
                   borderRadius: 'var(--radius-md)',
-                  background: 'rgba(230,168,23,0.08)',
-                  border: '1px solid rgba(230,168,23,0.18)',
+                  background: 'rgba(198,161,91,0.08)',
+                  border: '1px solid rgba(198,161,91,0.18)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -259,7 +259,7 @@ export default function LandingPage() {
                   fontSize: '10px',
                   fontWeight: 700,
                   letterSpacing: '0.2em',
-                  color: 'rgba(230,168,23,0.3)',
+                  color: 'rgba(198,161,91,0.3)',
                 }}>
                   {num}
                 </span>
