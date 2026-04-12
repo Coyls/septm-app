@@ -8,7 +8,6 @@ import { ToasterProvider } from "@/components/layout/ToasterProvider"
 import "./globals.css"
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
   subsets: ["latin"],
 })
 
@@ -31,7 +30,7 @@ export default function RootLayout({
     <html
       lang="fr"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.className} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full">
         <ThemeProvider
