@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import { Inter, Cinzel } from "next/font/google"
 import { ThemeProvider } from "next-themes"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { QueryProvider } from "@/components/layout/QueryProvider"
@@ -7,13 +7,15 @@ import { CsrfProvider } from "@/components/layout/CsrfProvider"
 import { ToasterProvider } from "@/components/layout/ToasterProvider"
 import "./globals.css"
 
-const geistSans = Geist({
+const inter = Inter({
+  variable: "--font-sans",
   subsets: ["latin"],
 })
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const cinzel = Cinzel({
+  variable: "--font-cinzel",
   subsets: ["latin"],
+  weight: ["400", "600", "700"],
 })
 
 export const metadata: Metadata = {
@@ -30,7 +32,7 @@ export default function RootLayout({
     <html
       lang="fr"
       suppressHydrationWarning
-      className={`${geistSans.className} ${geistMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${cinzel.variable} h-full antialiased`}
     >
       <body className="min-h-full">
         <ThemeProvider

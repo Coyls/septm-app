@@ -42,7 +42,7 @@ export function Sidebar({ className }: { className?: string }) {
       {/* Logo */}
       <div className="flex items-center gap-2 px-2 mb-6">
         <Trophy className="h-6 w-6 text-primary" />
-        <span className="font-bold text-lg tracking-tight">SEPTM</span>
+        <span className="font-heading font-bold text-lg tracking-widest uppercase">SEPTM</span>
       </div>
 
       {/* Navigation */}

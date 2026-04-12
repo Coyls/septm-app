@@ -7,8 +7,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-heading: var(--font-cinzel);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -95,6 +94,11 @@
   /* Patine olive, pour les états de succès */
   --success:               #6B7C50;
 
+  /* ── Typographie — couleurs de texte ──────────────────────────────────── */
+  --text-primary:          #E8DDC9;  /* ivoire, texte principal */
+  --text-secondary:        #B9AC96;  /* beige désaturé, texte secondaire */
+  --text-weak:             #8E8273;  /* brun/gris, texte faible */
+
   /* Rayon légèrement plus serré — sobriété architecturale */
   --radius:                0.45rem;
 
@@ -169,5 +173,13 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    line-height: 1.5;
+  }
+  h1, h2, h3 {
+    font-family: var(--font-cinzel), ui-serif, serif;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 1.2;
   }
 }
