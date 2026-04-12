@@ -4,6 +4,7 @@ import { useCsrfStore } from "@/stores/csrf.store";
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "/api/v1";
 
 let isRefreshing = false;
+let refreshQueue: Array<(success: boolean) => void> = [];
 
 async function doRefresh(): Promise<boolean> {
   try {
@@ -16,6 +17,12 @@ async function doRefresh(): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+function waitForRefresh(): Promise<boolean> {
+  return new Promise((resolve) => {
+    refreshQueue.push(resolve);
+  });
 }
 
 function redirectToSignIn(): never {
@@ -45,13 +52,23 @@ export async function apiFetch<T = unknown>(
     headers,
   });
 
-  if (response.status === 401 && !isRefreshing) {
-    isRefreshing = true;
-    const refreshed = await doRefresh();
-    isRefreshing = false;
+  if (response.status === 401) {
+    let refreshed: boolean;
+
+    if (isRefreshing) {
+      // Another request is already refreshing — wait for it to complete
+      refreshed = await waitForRefresh();
+    } else {
+      isRefreshing = true;
+      refreshed = await doRefresh();
+      isRefreshing = false;
+      // Resolve all queued requests with the refresh result
+      refreshQueue.forEach((resolve) => resolve(refreshed));
+      refreshQueue = [];
+    }
 
     if (refreshed) {
-      // Retry original request once
+      // Retry original request once with fresh cookies
       const retryResponse = await fetch(`${API_URL}${url}`, {
         ...options,
         credentials: "include",
@@ -75,7 +92,6 @@ export async function apiFetch<T = unknown>(
     } else {
       // Refresh failed — clear state and redirect
       useCsrfStore.getState().clearToken();
-      // Lazy import to avoid circular dependency
       const { getQueryClient } = await import("@/lib/query/client");
       try {
         getQueryClient().clear();
