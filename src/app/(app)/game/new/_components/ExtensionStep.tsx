@@ -1,12 +1,22 @@
 "use client"
 
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import { ToggleTile } from "@/components/ui/toggle-tile"
 import { useGameOptions } from "@/lib/query/hooks/useGameOptions"
 import { useGameWizardStore } from "@/stores/game-wizard.store"
 import type { ExtensionId } from "@/lib/types"
+
+const EXTENSION_IMAGES: Partial<Record<ExtensionId, string>> = {
+  VANILLA:       "/extensions/extension-vanilla.png",
+  LEADER:        "/extensions/extension-leader.png",
+  CITIES:        "/extensions/extension-cities.png",
+  ARMADA:        "/extensions/extension-armada.png",
+  EDIFICE:       "/extensions/extension-edifice.png",
+  GRAND_PROJECT: "/extensions/extension-grand-projet.png",
+  BABEL:         "/extensions/extension-babel.png",
+  WONDER_PACK:   "/extensions/extension-wonder-pack.png",
+}
 
 export function ExtensionStep() {
   const { data: options, isLoading } = useGameOptions()
@@ -22,38 +32,28 @@ export function ExtensionStep() {
       </div>
 
       {isLoading ? (
-        <div className="space-y-3">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {[...Array(6)].map((_, i) => (
-            <Skeleton key={i} className="h-10 w-full" />
+            <Skeleton key={i} className="h-14 w-full rounded-lg" />
           ))}
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {options?.extensions.map((ext) => {
             const isVanilla = ext.id === "VANILLA"
             const isChecked =
               isVanilla || selectedExtensions.includes(ext.id as ExtensionId)
 
             return (
-              <div key={ext.id} className="flex items-center gap-3">
-                <Checkbox
-                  id={ext.id}
-                  checked={isChecked}
-                  disabled={isVanilla}
-                  onCheckedChange={() => toggleExtension(ext.id as ExtensionId)}
-                />
-                <Label
-                  htmlFor={ext.id}
-                  className={isVanilla ? "text-muted-foreground" : "cursor-pointer"}
-                >
-                  {ext.name}
-                  {isVanilla && (
-                    <span className="ml-2 text-xs text-muted-foreground">
-                      (toujours inclus)
-                    </span>
-                  )}
-                </Label>
-              </div>
+              <ToggleTile
+                key={ext.id}
+                label={ext.name}
+                sublabel={isVanilla ? "toujours inclus" : undefined}
+                image={EXTENSION_IMAGES[ext.id as ExtensionId]}
+                checked={isChecked}
+                disabled={isVanilla}
+                onChange={() => toggleExtension(ext.id as ExtensionId)}
+              />
             )
           })}
         </div>
