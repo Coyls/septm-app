@@ -1,5 +1,5 @@
-import { StatisticsContent } from "@/components/statistics/StatisticsContent"
+import { MyStatisticsContent } from "@/components/statistics/MyStatisticsContent"
 
 export default function MyStatisticsPage() {
-  return <StatisticsContent mode="me" />
+  return <MyStatisticsContent />
 }

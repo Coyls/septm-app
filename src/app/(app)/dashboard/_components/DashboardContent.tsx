@@ -34,7 +34,9 @@ export function DashboardContent() {
   }
 
   return (
-    <div className="space-y-8 max-w-4xl">
+    <div className="w-full space-y-6">
+
+      {/* Header */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold">Tableau de bord</h1>
@@ -71,67 +73,78 @@ export function DashboardContent() {
         </Link>
       </div>
 
-      {/* Quick stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {statsLoading ? (
-          <>
-            <Skeleton className="h-24 rounded-lg" />
-            <Skeleton className="h-24 rounded-lg" />
-            <Skeleton className="h-24 rounded-lg" />
-          </>
-        ) : (
-          <>
-            <StatCard
-              label="Parties jouées"
-              value={myStats?.games ?? stats?.totalFinishedGames ?? 0}
-              icon={Trophy}
-            />
-            <StatCard
-              label="Score moyen"
-              value={
-                myStats ? formatScore(Math.round(myStats.averageScore)) : "—"
-              }
-              icon={BarChart2}
-            />
-            <StatCard
-              label="Taux de victoire"
-              value={myStats ? formatWinRate(myStats.winRate) : "—"}
-              icon={Users}
-            />
-          </>
-        )}
-      </div>
+      {/*
+        Desktop : grille 3 colonnes
+          - 2/3 gauche  → 3 StatCards côte à côte
+          - 1/3 droite  → carte demandes d'amis, même hauteur
 
-      {/* Pending friend requests */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Users className="h-4 w-4" />
-            Demandes d&apos;amis en attente
-            {pendingCount > 0 && (
-              <Badge variant="destructive" className="ml-1">
-                {pendingCount}
-              </Badge>
-            )}
-          </CardTitle>
-          <Link href="/friends" className={buttonVariants({ variant: "ghost", size: "sm" })}>
-            Voir tout
-          </Link>
-        </CardHeader>
-        <CardContent>
-          {pendingCount === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              Aucune demande en attente.
-            </p>
+        Mobile : empilement vertical
+      */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+        {/* StatCards — 2/3 de la largeur */}
+        <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {statsLoading ? (
+            <>
+              <Skeleton className="h-24 rounded-lg" />
+              <Skeleton className="h-24 rounded-lg" />
+              <Skeleton className="h-24 rounded-lg" />
+            </>
           ) : (
-            <p className="text-sm text-muted-foreground">
-              Vous avez{" "}
-              <strong className="text-foreground">{pendingCount}</strong>{" "}
-              demande{pendingCount > 1 ? "s" : ""} d&apos;ami en attente.
-            </p>
+            <>
+              <StatCard
+                label="Parties jouées"
+                value={myStats?.games ?? stats?.totalFinishedGames ?? 0}
+                icon={Trophy}
+              />
+              <StatCard
+                label="Score moyen"
+                value={myStats ? formatScore(Math.round(myStats.averageScore)) : "—"}
+                icon={BarChart2}
+              />
+              <StatCard
+                label="Taux de victoire"
+                value={myStats ? formatWinRate(myStats.winRate) : "—"}
+                icon={Users}
+              />
+            </>
           )}
-        </CardContent>
-      </Card>
+        </div>
+
+        {/* Demandes d'amis — 1/3 de la largeur, même hauteur que les StatCards */}
+        <div className="lg:col-span-1">
+          <Card className="h-full">
+            <CardHeader className="flex flex-row items-center justify-between pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                Demandes d&apos;amis
+                {pendingCount > 0 && (
+                  <Badge variant="destructive" className="ml-1">
+                    {pendingCount}
+                  </Badge>
+                )}
+              </CardTitle>
+              <Link href="/friends" className={buttonVariants({ variant: "ghost", size: "sm" })}>
+                Voir tout
+              </Link>
+            </CardHeader>
+            <CardContent>
+              {pendingCount === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  Aucune demande en attente.
+                </p>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  Vous avez{" "}
+                  <strong className="text-foreground">{pendingCount}</strong>{" "}
+                  demande{pendingCount > 1 ? "s" : ""} en attente.
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+      </div>
     </div>
   )
 }
