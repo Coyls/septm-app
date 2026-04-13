@@ -8,10 +8,14 @@ let refreshQueue: Array<(success: boolean) => void> = [];
 
 async function doRefresh(): Promise<boolean> {
   try {
+    const csrfToken = useCsrfStore.getState().token;
     const res = await fetch(`${API_URL}/auth/refresh`, {
       method: "POST",
       credentials: "include",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(csrfToken ? { "x-csrf-token": csrfToken } : {}),
+      },
     });
     return res.ok;
   } catch {

@@ -1,5 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 
+const API_INTERNAL = process.env.API_INTERNAL_URL ?? "http://localhost:3000/api/v1";
+
 // No auth check — always accessible
 const OPEN_PATHS = ["/", "/statistics"];
 
@@ -11,18 +13,39 @@ async function checkAuth(request: NextRequest): Promise<boolean> {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 3000);
 
-    const res = await fetch(
-      `${process.env.API_INTERNAL_URL ?? "http://localhost:3000/api/v1"}/auth/me`,
-      {
-        headers: { cookie: request.headers.get("cookie") ?? "" },
-        cache: "no-store",
-        signal: controller.signal,
-      },
-    );
+    const res = await fetch(`${API_INTERNAL}/auth/me`, {
+      headers: { cookie: request.headers.get("cookie") ?? "" },
+      cache: "no-store",
+      signal: controller.signal,
+    });
     clearTimeout(timeout);
     return res.ok;
   } catch {
     return false;
+  }
+}
+
+/** Attempt a server-side token refresh. Returns Set-Cookie headers on success, null on failure. */
+async function tryRefresh(request: NextRequest): Promise<string[] | null> {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3000);
+
+    const res = await fetch(`${API_INTERNAL}/auth/refresh`, {
+      method: "POST",
+      headers: {
+        cookie: request.headers.get("cookie") ?? "",
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+    if (!res.ok) return null;
+    const cookies = res.headers.getSetCookie();
+    return cookies.length > 0 ? cookies : null;
+  } catch {
+    return null;
   }
 }
 
@@ -44,8 +67,21 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Protected pages — redirect unauthenticated users to signin
+  // Protected pages
   if (!isAuthenticated) {
+    // Access token expired — try to refresh before giving up
+    const newCookies = await tryRefresh(request);
+
+    if (newCookies) {
+      // Refresh succeeded: let the request through and forward the new cookies
+      const response = NextResponse.next();
+      for (const cookie of newCookies) {
+        response.headers.append("Set-Cookie", cookie);
+      }
+      return response;
+    }
+
+    // Truly unauthenticated — redirect to signin
     const redirectUrl = new URL("/auth/signin", request.url);
     redirectUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(redirectUrl);

@@ -5,7 +5,6 @@ import { StatCard } from "@/components/statistics/StatCard";
 import { Competitiveness } from "@/components/statistics/charts/Competitiveness";
 import { ExtensionImpact } from "@/components/statistics/charts/ExtensionImpact";
 import { MonthlyTrend } from "@/components/statistics/charts/MonthlyTrend";
-import { PlayerRankings } from "@/components/statistics/charts/PlayerRankings";
 import { PointTypeDistribution } from "@/components/statistics/charts/PointTypeDistribution";
 import { ScoreDistribution } from "@/components/statistics/charts/ScoreDistribution";
 import { SidePerformance } from "@/components/statistics/charts/SidePerformance";
@@ -13,7 +12,7 @@ import { WonderHighlights } from "@/components/statistics/charts/WonderHighlight
 import { WonderPerformance } from "@/components/statistics/charts/WonderPerformance";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMyStats } from "@/lib/query/hooks/useStatistics";
-import { Trophy } from "lucide-react";
+import { Swords, Target, Trophy } from "lucide-react";
 import { useState } from "react";
 
 export function MyStatisticsContent() {
@@ -36,24 +35,41 @@ export function MyStatisticsContent() {
           </div>
         )}
 
-        {/* KPI — petite tuile */}
-        <div className="lg:col-span-1 flex flex-col">
-          {isLoading ? (
-            <Skeleton className="h-full min-h-24 rounded-lg" />
-          ) : (
-            <StatCard
-              label="Parties terminées"
-              value={data?.totalFinishedGames ?? 0}
-              icon={Trophy}
-              className="h-full"
-            />
-          )}
-        </div>
-
-        {/* Classement joueurs — tuile large */}
-        <div className="lg:col-span-3 [&>div]:h-full">
-          <PlayerRankings data={data?.byPlayer} isLoading={isLoading} />
-        </div>
+        {/* KPIs personnels */}
+        {isLoading ? (
+          <>
+            <div className="lg:col-span-1"><Skeleton className="h-24 rounded-lg" /></div>
+            <div className="lg:col-span-1"><Skeleton className="h-24 rounded-lg" /></div>
+            <div className="lg:col-span-2"><Skeleton className="h-24 rounded-lg" /></div>
+          </>
+        ) : (
+          <>
+            <div className="lg:col-span-1">
+              <StatCard
+                label="Parties terminées"
+                value={data?.totalFinishedGames ?? 0}
+                icon={Trophy}
+                className="h-full"
+              />
+            </div>
+            <div className="lg:col-span-1">
+              <StatCard
+                label="Taux de victoire"
+                value={data?.byPlayer[0] ? `${data.byPlayer[0].winRate} %` : "—"}
+                icon={Target}
+                className="h-full"
+              />
+            </div>
+            <div className="lg:col-span-2">
+              <StatCard
+                label="Score moyen"
+                value={data?.byPlayer[0] ? `${Math.round(data.byPlayer[0].averageScore)} pts` : "—"}
+                icon={Swords}
+                className="h-full"
+              />
+            </div>
+          </>
+        )}
 
         {/* Tendance mensuelle */}
         <div className="lg:col-span-2 [&>div]:h-full">
