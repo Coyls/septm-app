@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator"
 import { useGameWizardStore } from "@/stores/game-wizard.store"
 import { useCreateGame } from "@/lib/query/hooks/useGame"
 import { useGameOptions } from "@/lib/query/hooks/useGameOptions"
+import { useMe } from "@/lib/query/hooks/useAuth"
 import { getErrorMessage } from "@/lib/utils"
 import { AppError } from "@/lib/types"
 import { toast } from "sonner"
@@ -14,6 +15,7 @@ import { toast } from "sonner"
 export function ConfirmationStep() {
   const { selectedExtensions, players, setStep } = useGameWizardStore()
   const { data: options } = useGameOptions()
+  const { data: meData } = useMe()
   const { mutate: createGame, isPending } = useCreateGame()
 
   function getExtensionName(id: string) {
@@ -91,7 +93,7 @@ export function ConfirmationStep() {
                   </div>
                   {player.userId && (
                     <Badge variant="outline" className="text-xs">
-                      Ami lié
+                      {player.userId === meData?.user?.userId ? "Vous" : "Ami lié"}
                     </Badge>
                   )}
                 </div>

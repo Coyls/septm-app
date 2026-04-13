@@ -21,6 +21,7 @@ interface GameWizardState {
   createdGameId: string | null
 
   setStep: (step: 1 | 2 | 3) => void
+  initSelfPlayer: (userId: string) => void
   addPlayer: () => void
   removePlayer: (id: string) => void
   updatePlayer: (id: string, updates: Partial<Omit<WizardPlayer, "id">>) => void
@@ -42,6 +43,33 @@ export const useGameWizardStore = create<GameWizardState>()(
       ...initialState,
 
       setStep: (step) => set({ step }),
+
+      initSelfPlayer: (userId) =>
+        set((state) => {
+          if (state.players.length === 0) {
+            return {
+              players: [
+                {
+                  id: crypto.randomUUID(),
+                  playerType: "friend" as const,
+                  name: "",
+                  userId,
+                  wonderId: null,
+                  wonderSide: "A",
+                },
+              ],
+            }
+          }
+          // Fix stale player 0 if userId or playerType is wrong
+          const [self, ...rest] = state.players
+          if (self.userId === userId && self.playerType === "friend") return state
+          return {
+            players: [
+              { ...self, playerType: "friend" as const, userId },
+              ...rest,
+            ],
+          }
+        }),
 
       addPlayer: () =>
         set((state) => ({

@@ -1,19 +1,19 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Trash2, PlusCircle, Users, UserRound } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
-import { WonderCard } from "@/components/game/WonderCard"
+import { WonderPicker } from "@/components/game/WonderPicker"
 import { FriendCombobox } from "@/components/friends/FriendCombobox"
 import { useGameOptions } from "@/lib/query/hooks/useGameOptions"
+import { useMe } from "@/lib/query/hooks/useAuth"
 import { useGameWizardStore } from "@/stores/game-wizard.store"
 import { cn } from "@/lib/utils"
-import type { ExtensionId, Wonder, WonderId, Side } from "@/lib/types"
+import type { ExtensionId, Wonder, WonderId } from "@/lib/types"
 import type { WizardPlayerType } from "@/stores/game-wizard.store"
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -35,9 +35,11 @@ const PLAYER_TYPES: { value: Exclude<WizardPlayerType, null>; label: string; ico
 
 export function PlayerStep() {
   const { data: options, isLoading } = useGameOptions()
+  const { data: meData } = useMe()
   const {
     players,
     selectedExtensions,
+    initSelfPlayer,
     addPlayer,
     removePlayer,
     updatePlayer,
@@ -45,6 +47,12 @@ export function PlayerStep() {
   } = useGameWizardStore()
 
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+  useEffect(() => {
+    if (meData?.user?.userId) {
+      initSelfPlayer(meData.user.userId)
+    }
+  }, [meData?.user?.userId, initSelfPlayer])
 
   const availableWonders: Wonder[] =
     options?.wonders.filter((w) =>
@@ -70,8 +78,12 @@ export function PlayerStep() {
       newErrors["_global"] = "Il faut au minimum 3 joueurs."
     }
 
-    players.forEach((p) => {
-      if (!p.playerType) {
+    players.forEach((p, idx) => {
+      const isSelf = idx === 0
+      // Self player is always treated as "friend" regardless of stored playerType
+      const effectiveType = isSelf ? "friend" : p.playerType
+
+      if (!effectiveType) {
         newErrors[`${p.id}_type`] = "Choisissez un type de joueur."
         return
       }
@@ -80,11 +92,11 @@ export function PlayerStep() {
         newErrors[`${p.id}_name`] = "Le nom est requis."
       }
 
-      if (p.playerType === "friend" && !p.userId) {
+      if (effectiveType === "friend" && !p.userId) {
         newErrors[`${p.id}_friend`] = "Sélectionnez un ami."
       }
 
-      if (p.playerType === "guest") {
+      if (effectiveType === "guest") {
         if (!p.email?.trim()) {
           newErrors[`${p.id}_email`] = "L'email est requis."
         } else if (!EMAIL_RE.test(p.email.trim())) {
@@ -129,23 +141,34 @@ export function PlayerStep() {
       )}
 
       <div className="space-y-4">
-        {players.map((player, idx) => (
+        {players.map((player, idx) => {
+          const isSelf = idx === 0
+
+          return (
           <Card key={player.id}>
             <CardHeader className="pb-3 flex flex-row items-center justify-between">
-              <CardTitle className="text-base">Joueur {idx + 1}</CardTitle>
+              <div className="flex items-center gap-2">
+                <CardTitle className="text-base">Joueur {idx + 1}</CardTitle>
+                {isSelf && (
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/30 font-medium">
+                    Vous
+                  </span>
+                )}
+              </div>
               <Button
                 variant="ghost"
                 size="icon"
                 className="h-7 w-7 text-muted-foreground hover:text-destructive"
                 onClick={() => removePlayer(player.id)}
-                disabled={players.length <= 1}
+                disabled={isSelf}
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
             </CardHeader>
             <CardContent className="space-y-4">
 
-              {/* Step 1 — player type */}
+              {/* Type toggle — hidden for self (always "friend") */}
+              {!isSelf && (
               <div className="space-y-1.5">
                 <Label>Type de joueur</Label>
                 <div className="grid grid-cols-2 gap-2">
@@ -155,7 +178,7 @@ export function PlayerStep() {
                       type="button"
                       onClick={() => handleTypeChange(player.id, value)}
                       className={cn(
-                        "flex items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-all",
+                        "flex items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-all cursor-pointer",
                         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                         player.playerType === value
                           ? "border-primary/60 bg-primary/10 text-foreground shadow-[inset_0_0_0_1px_hsl(var(--primary)/0.25)]"
@@ -177,9 +200,25 @@ export function PlayerStep() {
                   <p className="text-xs text-destructive">{errors[`${player.id}_type`]}</p>
                 )}
               </div>
+              )}
 
-              {/* Step 2 — identity fields, shown only after type is chosen */}
-              {player.playerType === "friend" && (
+              {/* Identity fields */}
+              {isSelf && (
+                <div className="space-y-1">
+                  <Label htmlFor={`name-${player.id}`}>Nom affiché *</Label>
+                  <Input
+                    id={`name-${player.id}`}
+                    value={player.name}
+                    onChange={(e) => updatePlayer(player.id, { name: e.target.value })}
+                    placeholder="Prénom ou pseudo"
+                  />
+                  {errors[`${player.id}_name`] && (
+                    <p className="text-xs text-destructive">{errors[`${player.id}_name`]}</p>
+                  )}
+                </div>
+              )}
+
+              {!isSelf && player.playerType === "friend" && (
                 <>
                   <div className="space-y-1">
                     <Label>Ami *</Label>
@@ -196,7 +235,6 @@ export function PlayerStep() {
                       <p className="text-xs text-destructive">{errors[`${player.id}_friend`]}</p>
                     )}
                   </div>
-
                   <div className="space-y-1">
                     <Label htmlFor={`name-${player.id}`}>Nom affiché *</Label>
                     <Input
@@ -212,7 +250,7 @@ export function PlayerStep() {
                 </>
               )}
 
-              {player.playerType === "guest" && (
+              {!isSelf && player.playerType === "guest" && (
                 <>
                   <div className="space-y-1">
                     <Label htmlFor={`name-${player.id}`}>Nom *</Label>
@@ -226,7 +264,6 @@ export function PlayerStep() {
                       <p className="text-xs text-destructive">{errors[`${player.id}_name`]}</p>
                     )}
                   </div>
-
                   <div className="space-y-1">
                     <Label htmlFor={`email-${player.id}`}>Email *</Label>
                     <Input
@@ -243,44 +280,39 @@ export function PlayerStep() {
                 </>
               )}
 
-              {/* Wonder selection — shown only after type is chosen */}
-              {player.playerType && (
+              {/* Wonder selection — always visible for self, otherwise after type is chosen */}
+              {(isSelf || player.playerType) && (
                 <div className="space-y-1">
                   <Label>Merveille *</Label>
                   {errors[`${player.id}_wonder`] && (
                     <p className="text-xs text-destructive">{errors[`${player.id}_wonder`]}</p>
                   )}
-                  <ScrollArea className="h-64 pr-2">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {availableWonders.map((wonder) => {
-                        const isChosen =
-                          chosenWonderIds.has(wonder.id as WonderId) &&
-                          player.wonderId !== wonder.id
-                        return (
-                          <WonderCard
-                            key={wonder.id}
-                            wonder={wonder}
-                            selectedSide={player.wonderSide}
-                            onSideChange={(side: Side) =>
-                              updatePlayer(player.id, { wonderSide: side })
-                            }
-                            isSelected={player.wonderId === wonder.id}
-                            onSelect={() =>
-                              updatePlayer(player.id, { wonderId: wonder.id as WonderId })
-                            }
-                            isDisabled={isChosen}
-                            availableExtensions={selectedExtensions as ExtensionId[]}
-                          />
-                        )
-                      })}
-                    </div>
-                  </ScrollArea>
+                  <WonderPicker
+                    wonders={availableWonders}
+                    value={player.wonderId}
+                    selectedSide={player.wonderSide}
+                    onWonderChange={(wonderId) =>
+                      updatePlayer(player.id, { wonderId })
+                    }
+                    onSideChange={(side) =>
+                      updatePlayer(player.id, { wonderSide: side })
+                    }
+                    disabledWonderIds={
+                      new Set(
+                        players
+                          .filter((p) => p.id !== player.id && p.wonderId)
+                          .map((p) => p.wonderId as WonderId),
+                      )
+                    }
+                    availableExtensions={selectedExtensions as ExtensionId[]}
+                  />
                 </div>
               )}
 
             </CardContent>
           </Card>
-        ))}
+          )
+        })}
       </div>
 
       <Button
