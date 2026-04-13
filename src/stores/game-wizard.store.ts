@@ -12,6 +12,7 @@ export interface WizardPlayer {
   email?: string
   wonderId: WonderId | null
   wonderSide: Side
+  backendPlayerId?: string
 }
 
 interface GameWizardState {
@@ -27,6 +28,7 @@ interface GameWizardState {
   updatePlayer: (id: string, updates: Partial<Omit<WizardPlayer, "id">>) => void
   toggleExtension: (extensionId: ExtensionId) => void
   setCreatedGameId: (id: string) => void
+  setBackendPlayerIds: (backendPlayers: Array<{ id: string; name: string }>) => void
   reset: () => void
 }
 
@@ -109,6 +111,15 @@ export const useGameWizardStore = create<GameWizardState>()(
         }),
 
       setCreatedGameId: (id) => set({ createdGameId: id }),
+
+      // Map backend player IDs by index (backend preserves creation order)
+      setBackendPlayerIds: (backendPlayers) =>
+        set((state) => ({
+          players: state.players.map((p, idx) => ({
+            ...p,
+            backendPlayerId: backendPlayers[idx]?.id ?? p.backendPlayerId,
+          })),
+        })),
 
       reset: () => set(initialState),
     }),

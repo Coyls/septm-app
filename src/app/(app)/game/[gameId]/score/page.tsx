@@ -14,16 +14,24 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { PlayerScoreCard, type PlayerScoreState } from "@/components/game/PlayerScoreCard"
-import { LiveLeaderboard } from "@/components/game/LiveLeaderboard"
 import { useGameWizardStore } from "@/stores/game-wizard.store"
 import { useSubmitScore } from "@/lib/query/hooks/useGame"
 import { useGameOptions } from "@/lib/query/hooks/useGameOptions"
 import { EXTENSION_POINT_TYPES, POINT_TYPE_META } from "@/lib/types"
-import type { PointTypeId, ExtensionId } from "@/lib/types"
-import { getErrorMessage } from "@/lib/utils"
+import { calculatePlayerTotal, formatCoinsToPoints, getErrorMessage } from "@/lib/utils"
 import { AppError } from "@/lib/types"
 import { toast } from "sonner"
+import { cn } from "@/lib/utils"
+import type { PointTypeId, ExtensionId, PointTypeMeta } from "@/lib/types"
+
+export interface PlayerScoreState {
+  playerId: string
+  playerName: string
+  wonderName: string
+  wonderSide: string
+  coins: number
+  points: Record<PointTypeId, number>
+}
 
 export default function ScorePage({
   params,
@@ -35,22 +43,24 @@ export default function ScorePage({
   const { data: options } = useGameOptions()
   const { mutate: submitScore, isPending } = useSubmitScore(gameId)
 
-  // Compute allowed point types from extensions
   const allowedPointTypeIds = new Set<PointTypeId>(
     (selectedExtensions as ExtensionId[]).flatMap(
       (ext) => EXTENSION_POINT_TYPES[ext] ?? [],
     ),
   )
-  const allowedPointTypes = Object.values(POINT_TYPE_META).filter((pt) =>
-    allowedPointTypeIds.has(pt.id),
-  )
 
-  // Get wonder names from options
+  const rows: PointTypeMeta[] = Object.values(POINT_TYPE_META)
+    .filter((pt) => allowedPointTypeIds.has(pt.id))
+    .sort((a, b) => a.order - b.order)
+
+  // COIN row is always first and handled separately
+  const coinRow = rows.find((r) => r.id === "COIN")
+  const pointRows = rows.filter((r) => r.id !== "COIN")
+
   function getWonderName(wonderId: string) {
     return options?.wonders.find((w) => w.id === wonderId)?.name ?? wonderId
   }
 
-  // Initialize scores from wizard store
   const [scores, setScores] = useState<PlayerScoreState[]>([])
 
   useEffect(() => {
@@ -61,16 +71,13 @@ export default function ScorePage({
     if (players.length > 0 && scores.length === 0) {
       setScores(
         players.map((p) => ({
-          playerId: p.id, // using local wizard id; backend player id may differ
+          playerId: p.backendPlayerId ?? p.id,
           playerName: p.name,
-          wonderId: p.wonderId ?? "",
           wonderName: getWonderName(p.wonderId ?? ""),
           wonderSide: p.wonderSide,
           coins: 0,
           points: Object.fromEntries(
-            allowedPointTypes
-              .filter((pt) => pt.id !== "COIN")
-              .map((pt) => [pt.id, 0]),
+            pointRows.map((pt) => [pt.id, 0]),
           ) as Record<PointTypeId, number>,
         })),
       )
@@ -78,7 +85,9 @@ export default function ScorePage({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [players, options])
 
-  function handleChange(playerId: string, field: "coins" | PointTypeId, value: number) {
+  function handleChange(playerId: string, field: "coins" | PointTypeId, raw: string) {
+    const value = raw === "" ? 0 : parseInt(raw, 10)
+    if (isNaN(value)) return
     setScores((prev) =>
       prev.map((p) => {
         if (p.playerId !== playerId) return p
@@ -88,6 +97,17 @@ export default function ScorePage({
     )
   }
 
+  const sorted = [...scores].sort(
+    (a, b) =>
+      calculatePlayerTotal(b.coins, b.points) -
+      calculatePlayerTotal(a.coins, a.points),
+  )
+  const gap =
+    sorted.length >= 2
+      ? calculatePlayerTotal(sorted[0].coins, sorted[0].points) -
+        calculatePlayerTotal(sorted[1].coins, sorted[1].points)
+      : 0
+
   const allCoinsEntered = scores.every((s) => s.coins >= 0)
 
   function handleSubmit() {
@@ -96,12 +116,10 @@ export default function ScorePage({
         players: scores.map((s) => ({
           playerId: s.playerId,
           coins: s.coins,
-          points: allowedPointTypes
-            .filter((pt) => pt.id !== "COIN")
-            .map((pt) => ({
-              pointTypeId: pt.id,
-              points: s.points[pt.id] ?? 0,
-            })),
+          points: pointRows.map((pt) => ({
+            pointTypeId: pt.id,
+            points: s.points[pt.id] ?? 0,
+          })),
         })),
       },
       {
@@ -117,13 +135,14 @@ export default function ScorePage({
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-start justify-between gap-4 flex-wrap">
+    <div className="space-y-4">
+
+      {/* Page header */}
+      <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold">Saisie des scores</h1>
           <p className="text-sm text-muted-foreground">Partie #{gameId.slice(0, 8)}…</p>
         </div>
-
         <AlertDialog>
           <AlertDialogTrigger
             render={
@@ -136,44 +155,211 @@ export default function ScorePage({
             <AlertDialogHeader>
               <AlertDialogTitle>Finaliser la partie ?</AlertDialogTitle>
               <AlertDialogDescription>
-                Cette action est irréversible. Les scores seront enregistrés
-                définitivement.
+                Cette action est irréversible. Les scores seront enregistrés définitivement.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Annuler</AlertDialogCancel>
-              <AlertDialogAction onClick={handleSubmit}>
-                Confirmer
-              </AlertDialogAction>
+              <AlertDialogAction onClick={handleSubmit}>Confirmer</AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Score cards — 2/3 width */}
-        <div className="lg:col-span-2 space-y-4">
-          {scores.length === 0 ? (
-            <p className="text-muted-foreground text-sm">
-              Aucun joueur trouvé. Revenez à la création de partie.
-            </p>
-          ) : (
-            scores.map((player) => (
-              <PlayerScoreCard
-                key={player.playerId}
-                player={player}
-                allowedPointTypes={allowedPointTypes}
-                onChange={handleChange}
-              />
-            ))
+      {/* Live leaderboard bar */}
+      {sorted.length > 0 && (
+        <div className="flex items-center gap-2 overflow-x-auto rounded-lg border border-border bg-card px-3 py-2 text-sm">
+          <span className="shrink-0 text-xs text-muted-foreground font-medium uppercase tracking-wide pr-2 border-r border-border">
+            Classement
+          </span>
+          {sorted.map((p, idx) => {
+            const total = calculatePlayerTotal(p.coins, p.points)
+            const medals = ["🥇", "🥈", "🥉"]
+            return (
+              <div
+                key={p.playerId}
+                className={cn(
+                  "flex items-center gap-1.5 shrink-0 rounded-md px-2 py-1",
+                  idx === 0 ? "bg-primary/10 text-foreground" : "text-muted-foreground",
+                )}
+              >
+                <span className="text-xs">{medals[idx] ?? `${idx + 1}.`}</span>
+                <span className="text-xs font-medium truncate max-w-[80px]">{p.playerName}</span>
+                <span className={cn("text-xs font-bold", idx === 0 ? "text-primary" : "")}>
+                  {total}
+                </span>
+              </div>
+            )
+          })}
+          {sorted.length >= 2 && (
+            <span className="shrink-0 ml-auto text-xs text-muted-foreground pl-2 border-l border-border">
+              Écart : <strong className="text-foreground">{gap} pts</strong>
+            </span>
           )}
         </div>
+      )}
 
-        {/* Leaderboard — 1/3 width */}
-        <div>
-          <LiveLeaderboard players={scores} />
+      {/* Score table */}
+      {scores.length === 0 ? (
+        <p className="text-sm text-muted-foreground">
+          Aucun joueur trouvé. Revenez à la création de partie.
+        </p>
+      ) : (
+        <div className="overflow-x-auto rounded-lg border border-border">
+          <table className="w-full border-collapse" style={{ minWidth: `${180 + scores.length * 110}px` }}>
+
+            {/* Player headers */}
+            <thead>
+              <tr className="border-b border-border bg-card">
+                {/* Label column header */}
+                <th className="sticky left-0 z-20 bg-card w-[140px] min-w-[140px] px-3 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wide border-r border-border">
+                  Catégorie
+                </th>
+                {scores.map((p, idx) => {
+                  const total = calculatePlayerTotal(p.coins, p.points)
+                  const isLeader = sorted[0]?.playerId === p.playerId
+                  return (
+                    <th
+                      key={p.playerId}
+                      className={cn(
+                        "px-2 py-3 text-center min-w-[110px]",
+                        idx < scores.length - 1 && "border-r border-border",
+                      )}
+                    >
+                      <p className={cn(
+                        "text-sm font-semibold truncate",
+                        isLeader ? "text-primary" : "text-foreground",
+                      )}>
+                        {p.playerName || `J${idx + 1}`}
+                      </p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {p.wonderName} {p.wonderSide}
+                      </p>
+                      <p className={cn(
+                        "text-sm font-bold mt-0.5",
+                        isLeader ? "text-primary" : "text-foreground",
+                      )}>
+                        {total} pts
+                      </p>
+                    </th>
+                  )
+                })}
+              </tr>
+            </thead>
+
+            <tbody>
+              {/* Coins row */}
+              {coinRow && (
+                <tr className="border-b border-border hover:bg-muted/30 transition-colors">
+                  <td className="sticky left-0 z-10 bg-card px-3 py-3 border-r border-border">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="h-2.5 w-2.5 shrink-0 rounded-full"
+                        style={{ backgroundColor: coinRow.color }}
+                      />
+                      <span className="text-xs font-medium text-foreground whitespace-nowrap">
+                        {coinRow.label}
+                      </span>
+                    </div>
+                  </td>
+                  {scores.map((p, idx) => {
+                    const pts = formatCoinsToPoints(p.coins)
+                    return (
+                      <td
+                        key={p.playerId}
+                        className={cn(
+                          "px-2 py-2 text-center",
+                          idx < scores.length - 1 && "border-r border-border",
+                        )}
+                      >
+                        <input
+                          type="number"
+                          inputMode="numeric"
+                          min={0}
+                          value={p.coins === 0 ? "" : p.coins}
+                          onChange={(e) => handleChange(p.playerId, "coins", e.target.value)}
+                          placeholder="0"
+                          className="w-full rounded-md border border-border bg-background px-2 py-1.5 text-center text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                        />
+                        <p className="text-[11px] text-muted-foreground mt-1">
+                          = {pts} pt{pts !== 1 ? "s" : ""}
+                        </p>
+                      </td>
+                    )
+                  })}
+                </tr>
+              )}
+
+              {/* Point type rows */}
+              {pointRows.map((pt) => (
+                <tr
+                  key={pt.id}
+                  className="border-b border-border last:border-0 hover:bg-muted/20 transition-colors"
+                >
+                  <td className="sticky left-0 z-10 bg-background px-3 py-3 border-r border-border">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="h-2.5 w-2.5 shrink-0 rounded-full"
+                        style={{ backgroundColor: pt.color }}
+                      />
+                      <span className="text-xs font-medium text-foreground whitespace-nowrap">
+                        {pt.label}
+                      </span>
+                    </div>
+                  </td>
+                  {scores.map((p, idx) => (
+                    <td
+                      key={p.playerId}
+                      className={cn(
+                        "px-2 py-2 text-center",
+                        idx < scores.length - 1 && "border-r border-border",
+                      )}
+                    >
+                      <input
+                        type="number"
+                        inputMode="numeric"
+                        value={p.points[pt.id] === 0 ? "" : p.points[pt.id]}
+                        onChange={(e) => handleChange(p.playerId, pt.id, e.target.value)}
+                        placeholder="0"
+                        className="w-full rounded-md border border-border bg-background px-2 py-1.5 text-center text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                      />
+                    </td>
+                  ))}
+                </tr>
+              ))}
+
+              {/* Total row */}
+              <tr className="border-t-2 border-border bg-muted/20">
+                <td className="sticky left-0 z-10 bg-background px-3 py-3 border-r border-border">
+                  <span className="text-xs font-bold uppercase tracking-wide text-foreground">
+                    Total
+                  </span>
+                </td>
+                {scores.map((p, idx) => {
+                  const total = calculatePlayerTotal(p.coins, p.points)
+                  const isLeader = sorted[0]?.playerId === p.playerId
+                  return (
+                    <td
+                      key={p.playerId}
+                      className={cn(
+                        "px-2 py-3 text-center",
+                        idx < scores.length - 1 && "border-r border-border",
+                      )}
+                    >
+                      <span className={cn(
+                        "text-sm font-bold",
+                        isLeader ? "text-primary" : "text-foreground",
+                      )}>
+                        {total} pts
+                      </span>
+                    </td>
+                  )
+                })}
+              </tr>
+            </tbody>
+          </table>
         </div>
-      </div>
+      )}
     </div>
   )
 }

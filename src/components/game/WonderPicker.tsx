@@ -1,24 +1,32 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Image from "next/image"
-import { ChevronDown, Check } from "lucide-react"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
-import { cn } from "@/lib/utils"
-import type { Wonder, WonderId, Side, ExtensionId } from "@/lib/types"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import type { ExtensionId, Side, Wonder, WonderId } from "@/lib/types";
+import { cn } from "@/lib/utils";
+import { Check, ChevronDown } from "lucide-react";
+import Image from "next/image";
+import { useState } from "react";
 
-const WONDER_IMAGE = "/extensions/placeholder.png"
+const WONDER_IMAGE = "/extensions/placeholder.png";
 
 interface WonderPickerProps {
-  wonders: Wonder[]
-  value: WonderId | null
-  selectedSide: Side
-  onWonderChange: (wonderId: WonderId) => void
-  onSideChange: (side: Side) => void
-  disabledWonderIds: Set<WonderId>
-  availableExtensions: ExtensionId[]
+  wonders: Wonder[];
+  value: WonderId | null;
+  selectedSide: Side;
+  onWonderChange: (wonderId: WonderId) => void;
+  onSideChange: (side: Side) => void;
+  disabledWonderIds: Set<WonderId>;
+  availableExtensions: ExtensionId[];
 }
 
 export function WonderPicker({
@@ -30,14 +38,15 @@ export function WonderPicker({
   disabledWonderIds,
   availableExtensions,
 }: WonderPickerProps) {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
-  const selectedWonder = wonders.find((w) => w.id === value) ?? null
+  const selectedWonder = wonders.find((w) => w.id === value) ?? null;
 
-  const sideB = selectedWonder?.sides.find((s) => s.side === "B")
+  const sideB = selectedWonder?.sides.find((s) => s.side === "B");
   const sideBMissingExtensions =
-    sideB?.requiredExtensions.filter((e) => !availableExtensions.includes(e)) ?? []
-  const isSideBDisabled = sideBMissingExtensions.length > 0
+    sideB?.requiredExtensions.filter((e) => !availableExtensions.includes(e)) ??
+    [];
+  const isSideBDisabled = sideBMissingExtensions.length > 0;
 
   return (
     <div className="space-y-2">
@@ -78,15 +87,15 @@ export function WonderPicker({
         </PopoverTrigger>
 
         <PopoverContent
-          className="p-2 w-[var(--radix-popover-trigger-width)]"
+          className="p-2 w-(--radix-popover-trigger-width)"
           align="start"
           sideOffset={4}
         >
           <ScrollArea className="max-h-80">
-            <div className="grid grid-cols-4 gap-1.5 pr-1">
+            <div className="grid grid-cols-6 gap-1.5 pr-1">
               {wonders.map((wonder) => {
-                const isTaken = disabledWonderIds.has(wonder.id as WonderId)
-                const isSelected = wonder.id === value
+                const isTaken = disabledWonderIds.has(wonder.id as WonderId);
+                const isSelected = wonder.id === value;
 
                 return (
                   <button
@@ -94,8 +103,8 @@ export function WonderPicker({
                     type="button"
                     disabled={isTaken}
                     onClick={() => {
-                      onWonderChange(wonder.id as WonderId)
-                      setOpen(false)
+                      onWonderChange(wonder.id as WonderId);
+                      setOpen(false);
                     }}
                     className={cn(
                       "flex flex-col rounded-lg border overflow-hidden text-left transition-all",
@@ -126,16 +135,18 @@ export function WonderPicker({
                     </div>
 
                     {/* Name */}
-                    <div className={cn(
-                      "px-1.5 py-1.5",
-                      isSelected ? "bg-primary/10" : "bg-card",
-                    )}>
+                    <div
+                      className={cn(
+                        "px-1.5 py-1.5",
+                        isSelected ? "bg-primary/10" : "bg-card",
+                      )}
+                    >
                       <p className="text-xs font-medium leading-tight truncate">
                         {wonder.name}
                       </p>
                     </div>
                   </button>
-                )
+                );
               })}
             </div>
           </ScrollArea>
@@ -196,5 +207,5 @@ export function WonderPicker({
         </div>
       )}
     </div>
-  )
+  );
 }

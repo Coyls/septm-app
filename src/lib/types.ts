@@ -203,6 +203,7 @@ export interface CreateGameResponse {
   createdById: string;
   createdAt: string;
   updatedAt: string;
+  players: Array<{ id: string; name: string }>;
 }
 
 // Score

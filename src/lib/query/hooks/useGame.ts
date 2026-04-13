@@ -10,11 +10,13 @@ import { toast } from "sonner";
 export function useCreateGame() {
   const router = useRouter();
   const setCreatedGameId = useGameWizardStore((s) => s.setCreatedGameId);
+  const setBackendPlayerIds = useGameWizardStore((s) => s.setBackendPlayerIds);
 
   return useMutation({
     mutationFn: (body: CreateGameBody) => createGame(body),
     onSuccess: (data) => {
       setCreatedGameId(data.id);
+      setBackendPlayerIds(data.players);
       router.push(`/game/${data.id}/score`);
     },
     onError: () => {
