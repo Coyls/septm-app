@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Trash2, PlusCircle } from "lucide-react"
+import { Trash2, PlusCircle, Users, UserRound } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -12,7 +12,26 @@ import { WonderCard } from "@/components/game/WonderCard"
 import { FriendCombobox } from "@/components/friends/FriendCombobox"
 import { useGameOptions } from "@/lib/query/hooks/useGameOptions"
 import { useGameWizardStore } from "@/stores/game-wizard.store"
+import { cn } from "@/lib/utils"
 import type { ExtensionId, Wonder, WonderId, Side } from "@/lib/types"
+import type { WizardPlayerType } from "@/stores/game-wizard.store"
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+const PLAYER_TYPES: { value: Exclude<WizardPlayerType, null>; label: string; icon: React.ElementType; description: string }[] = [
+  {
+    value: "friend",
+    label: "Ami",
+    icon: Users,
+    description: "Compte existant",
+  },
+  {
+    value: "guest",
+    label: "Invité",
+    icon: UserRound,
+    description: "Sans compte",
+  },
+]
 
 export function PlayerStep() {
   const { data: options, isLoading } = useGameOptions()
@@ -27,14 +46,22 @@ export function PlayerStep() {
 
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  // Filter wonders based on selected extensions
   const availableWonders: Wonder[] =
     options?.wonders.filter((w) =>
       selectedExtensions.includes(w.extensionId as ExtensionId),
     ) ?? []
 
-  // Track chosen wonder IDs
   const chosenWonderIds = new Set(players.map((p) => p.wonderId).filter(Boolean))
+
+  function handleTypeChange(playerId: string, type: Exclude<WizardPlayerType, null>) {
+    // Reset identity fields when switching type
+    updatePlayer(playerId, {
+      playerType: type,
+      userId: undefined,
+      email: undefined,
+      name: "",
+    })
+  }
 
   function validate() {
     const newErrors: Record<string, string> = {}
@@ -44,8 +71,30 @@ export function PlayerStep() {
     }
 
     players.forEach((p) => {
-      if (!p.name.trim()) newErrors[`${p.id}_name`] = "Le nom est requis."
-      if (!p.wonderId) newErrors[`${p.id}_wonder`] = "Choisissez une merveille."
+      if (!p.playerType) {
+        newErrors[`${p.id}_type`] = "Choisissez un type de joueur."
+        return
+      }
+
+      if (!p.name.trim()) {
+        newErrors[`${p.id}_name`] = "Le nom est requis."
+      }
+
+      if (p.playerType === "friend" && !p.userId) {
+        newErrors[`${p.id}_friend`] = "Sélectionnez un ami."
+      }
+
+      if (p.playerType === "guest") {
+        if (!p.email?.trim()) {
+          newErrors[`${p.id}_email`] = "L'email est requis."
+        } else if (!EMAIL_RE.test(p.email.trim())) {
+          newErrors[`${p.id}_email`] = "Adresse email invalide."
+        }
+      }
+
+      if (!p.wonderId) {
+        newErrors[`${p.id}_wonder`] = "Choisissez une merveille."
+      }
     })
 
     setErrors(newErrors)
@@ -95,74 +144,140 @@ export function PlayerStep() {
               </Button>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Name */}
-              <div className="space-y-1">
-                <Label htmlFor={`name-${player.id}`}>Nom *</Label>
-                <Input
-                  id={`name-${player.id}`}
-                  value={player.name}
-                  onChange={(e) => updatePlayer(player.id, { name: e.target.value })}
-                  placeholder="Prénom ou pseudo"
-                />
-                {errors[`${player.id}_name`] && (
-                  <p className="text-xs text-destructive">
-                    {errors[`${player.id}_name`]}
-                  </p>
+
+              {/* Step 1 — player type */}
+              <div className="space-y-1.5">
+                <Label>Type de joueur</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  {PLAYER_TYPES.map(({ value, label, icon: Icon, description }) => (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => handleTypeChange(player.id, value)}
+                      className={cn(
+                        "flex items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-all",
+                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                        player.playerType === value
+                          ? "border-primary/60 bg-primary/10 text-foreground shadow-[inset_0_0_0_1px_hsl(var(--primary)/0.25)]"
+                          : "border-border bg-card text-muted-foreground hover:border-primary/40 hover:bg-primary/5 hover:text-foreground",
+                      )}
+                    >
+                      <Icon className={cn(
+                        "h-4 w-4 shrink-0",
+                        player.playerType === value ? "text-primary" : "text-muted-foreground",
+                      )} />
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium leading-tight">{label}</span>
+                        <span className="text-xs text-[var(--text-weak)] leading-tight">{description}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+                {errors[`${player.id}_type`] && (
+                  <p className="text-xs text-destructive">{errors[`${player.id}_type`]}</p>
                 )}
               </div>
 
-              {/* Friend association */}
-              <div className="space-y-1">
-                <Label>Associer à un ami</Label>
-                <FriendCombobox
-                  value={player.userId ?? null}
-                  onChange={(userId, name) => {
-                    updatePlayer(player.id, {
-                      userId: userId ?? undefined,
-                      name: name ?? player.name,
-                    })
-                  }}
-                />
-              </div>
-
-              {/* Wonder selection */}
-              <div className="space-y-1">
-                <Label>Merveille *</Label>
-                {errors[`${player.id}_wonder`] && (
-                  <p className="text-xs text-destructive">
-                    {errors[`${player.id}_wonder`]}
-                  </p>
-                )}
-                <ScrollArea className="h-64 pr-2">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {availableWonders.map((wonder) => {
-                      const isChosen =
-                        chosenWonderIds.has(wonder.id as WonderId) &&
-                        player.wonderId !== wonder.id
-                      return (
-                        <WonderCard
-                          key={wonder.id}
-                          wonder={wonder}
-                          selectedSide={player.wonderSide}
-                          onSideChange={(side: Side) =>
-                            updatePlayer(player.id, { wonderSide: side })
-                          }
-                          isSelected={player.wonderId === wonder.id}
-                          onSelect={() =>
-                            updatePlayer(player.id, {
-                              wonderId: wonder.id as WonderId,
-                            })
-                          }
-                          isDisabled={isChosen}
-                          availableExtensions={
-                            selectedExtensions as ExtensionId[]
-                          }
-                        />
-                      )
-                    })}
+              {/* Step 2 — identity fields, shown only after type is chosen */}
+              {player.playerType === "friend" && (
+                <>
+                  <div className="space-y-1">
+                    <Label>Ami *</Label>
+                    <FriendCombobox
+                      value={player.userId ?? null}
+                      onChange={(userId, name) => {
+                        updatePlayer(player.id, {
+                          userId: userId ?? undefined,
+                          name: name ?? player.name,
+                        })
+                      }}
+                    />
+                    {errors[`${player.id}_friend`] && (
+                      <p className="text-xs text-destructive">{errors[`${player.id}_friend`]}</p>
+                    )}
                   </div>
-                </ScrollArea>
-              </div>
+
+                  <div className="space-y-1">
+                    <Label htmlFor={`name-${player.id}`}>Nom affiché *</Label>
+                    <Input
+                      id={`name-${player.id}`}
+                      value={player.name}
+                      onChange={(e) => updatePlayer(player.id, { name: e.target.value })}
+                      placeholder="Prénom ou pseudo"
+                    />
+                    {errors[`${player.id}_name`] && (
+                      <p className="text-xs text-destructive">{errors[`${player.id}_name`]}</p>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {player.playerType === "guest" && (
+                <>
+                  <div className="space-y-1">
+                    <Label htmlFor={`name-${player.id}`}>Nom *</Label>
+                    <Input
+                      id={`name-${player.id}`}
+                      value={player.name}
+                      onChange={(e) => updatePlayer(player.id, { name: e.target.value })}
+                      placeholder="Prénom ou pseudo"
+                    />
+                    {errors[`${player.id}_name`] && (
+                      <p className="text-xs text-destructive">{errors[`${player.id}_name`]}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label htmlFor={`email-${player.id}`}>Email *</Label>
+                    <Input
+                      id={`email-${player.id}`}
+                      type="email"
+                      value={player.email ?? ""}
+                      onChange={(e) => updatePlayer(player.id, { email: e.target.value })}
+                      placeholder="joueur@exemple.com"
+                    />
+                    {errors[`${player.id}_email`] && (
+                      <p className="text-xs text-destructive">{errors[`${player.id}_email`]}</p>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {/* Wonder selection — shown only after type is chosen */}
+              {player.playerType && (
+                <div className="space-y-1">
+                  <Label>Merveille *</Label>
+                  {errors[`${player.id}_wonder`] && (
+                    <p className="text-xs text-destructive">{errors[`${player.id}_wonder`]}</p>
+                  )}
+                  <ScrollArea className="h-64 pr-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {availableWonders.map((wonder) => {
+                        const isChosen =
+                          chosenWonderIds.has(wonder.id as WonderId) &&
+                          player.wonderId !== wonder.id
+                        return (
+                          <WonderCard
+                            key={wonder.id}
+                            wonder={wonder}
+                            selectedSide={player.wonderSide}
+                            onSideChange={(side: Side) =>
+                              updatePlayer(player.id, { wonderSide: side })
+                            }
+                            isSelected={player.wonderId === wonder.id}
+                            onSelect={() =>
+                              updatePlayer(player.id, { wonderId: wonder.id as WonderId })
+                            }
+                            isDisabled={isChosen}
+                            availableExtensions={selectedExtensions as ExtensionId[]}
+                          />
+                        )
+                      })}
+                    </div>
+                  </ScrollArea>
+                </div>
+              )}
+
             </CardContent>
           </Card>
         ))}

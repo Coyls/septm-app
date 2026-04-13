@@ -2,8 +2,11 @@ import { create } from "zustand"
 import { persist, createJSONStorage } from "zustand/middleware"
 import type { ExtensionId, WonderId, Side } from "@/lib/types"
 
+export type WizardPlayerType = "friend" | "guest" | null
+
 export interface WizardPlayer {
   id: string
+  playerType: WizardPlayerType
   name: string
   userId?: string
   email?: string
@@ -46,6 +49,7 @@ export const useGameWizardStore = create<GameWizardState>()(
             ...state.players,
             {
               id: crypto.randomUUID(),
+              playerType: null,
               name: "",
               wonderId: null,
               wonderSide: "A",
