@@ -59,6 +59,7 @@ function ToggleTile({
             src={image}
             alt={label}
             fill
+            sizes="96px"
             className={cn(
               "object-cover transition-opacity",
               checked ? "opacity-80" : "opacity-30",
