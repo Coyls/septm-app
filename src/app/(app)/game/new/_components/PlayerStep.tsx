@@ -246,9 +246,12 @@ export function PlayerStep() {
                       <FriendCombobox
                         value={player.userId ?? null}
                         onChange={(userId, name) => {
+                          const defaultName = name?.includes("@")
+                            ? name.split("@")[0]
+                            : (name ?? player.name);
                           updatePlayer(player.id, {
                             userId: userId ?? undefined,
-                            name: name ?? player.name,
+                            name: defaultName,
                           });
                         }}
                       />

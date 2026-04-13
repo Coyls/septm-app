@@ -306,7 +306,7 @@ export default function FriendsPage() {
   const pendingCount = received?.length ?? 0
 
   return (
-    <div className="max-w-2xl space-y-4">
+    <div className="max-w-2xl mx-auto space-y-4">
       <h1 className="text-2xl font-bold">Amis</h1>
 
       <Tabs defaultValue="friends">

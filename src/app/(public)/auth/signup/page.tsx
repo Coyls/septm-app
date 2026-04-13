@@ -29,13 +29,13 @@ export default function SignUpPage() {
 
   const form = useForm<SignUpSchema>({
     resolver: zodResolver(signUpSchema),
-    defaultValues: { email: "", password: "", confirmPassword: "" },
+    defaultValues: { name: "", email: "", password: "", confirmPassword: "" },
   });
 
   function onSubmit(data: SignUpSchema) {
     setError(null);
     signUp(
-      { email: data.email, password: data.password },
+      { name: data.name, email: data.email, password: data.password },
       {
         onError: (err) => {
           if (err instanceof AppError && err.status === 429) {
@@ -68,6 +68,24 @@ export default function SignUpPage() {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nom</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Prénom ou pseudo"
+                      autoComplete="name"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="email"

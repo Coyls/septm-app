@@ -1,36 +1,40 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { useMe, useSignOut } from "@/lib/query/hooks/useAuth";
+import { useReceivedRequests } from "@/lib/query/hooks/useFriends";
+import { cn } from "@/lib/utils";
 import {
-  LayoutDashboard,
-  PlusCircle,
   BarChart2,
-  Users,
+  LayoutDashboard,
   LogOut,
+  PlusCircle,
   Trophy,
-} from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { cn } from "@/lib/utils"
-import { useMe } from "@/lib/query/hooks/useAuth"
-import { useSignOut } from "@/lib/query/hooks/useAuth"
-import { useReceivedRequests } from "@/lib/query/hooks/useFriends"
+  Users,
+} from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const navItems = [
+  {
+    href: "/game/new",
+    label: "Nouvelle partie",
+    icon: PlusCircle,
+    accent: true,
+  },
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/game/new", label: "Nouvelle partie", icon: PlusCircle, accent: true },
   { href: "/statistics/me", label: "Statistiques", icon: BarChart2 },
-]
+];
 
 export function Sidebar({ className }: { className?: string }) {
-  const pathname = usePathname()
-  const { data: meData } = useMe()
-  const { data: received } = useReceivedRequests()
-  const signOut = useSignOut()
+  const pathname = usePathname();
+  const { data: meData } = useMe();
+  const { data: received } = useReceivedRequests();
+  const signOut = useSignOut();
 
-  const pendingCount = received?.length ?? 0
+  const pendingCount = received?.length ?? 0;
 
   return (
     <aside
@@ -42,7 +46,9 @@ export function Sidebar({ className }: { className?: string }) {
       {/* Logo */}
       <div className="flex items-center gap-2 px-2 mb-6">
         <Trophy className="h-6 w-6 text-primary" />
-        <span className="font-heading font-bold text-lg tracking-widest uppercase">SEPTM</span>
+        <span className="font-heading font-bold text-lg tracking-widest uppercase">
+          SEPTM
+        </span>
       </div>
 
       {/* Navigation */}
@@ -106,5 +112,5 @@ export function Sidebar({ className }: { className?: string }) {
         </Button>
       </div>
     </aside>
-  )
+  );
 }
