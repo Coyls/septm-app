@@ -8,6 +8,12 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export function isSafeRedirect(value: string | null): value is string {
+  if (!value) return false;
+  // Only allow relative paths — block absolute URLs and protocol-relative URLs (//)
+  return value.startsWith("/") && !value.startsWith("//");
+}
+
 export function formatDate(isoString: string): string {
   return format(new Date(isoString), "d MMM yyyy", { locale: fr });
 }

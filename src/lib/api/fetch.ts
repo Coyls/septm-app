@@ -72,11 +72,19 @@ export async function apiFetch<T = unknown>(
     }
 
     if (refreshed) {
+      // Re-read CSRF token after refresh — the server may have rotated it
+      const freshCsrfToken = useCsrfStore.getState().token;
+      const retryHeaders: Record<string, string> = {
+        "Content-Type": "application/json",
+        ...(isMutation && freshCsrfToken ? { "x-csrf-token": freshCsrfToken } : {}),
+        ...(options.headers as Record<string, string> | undefined),
+      };
+
       // Retry original request once with fresh cookies
       const retryResponse = await fetch(`${API_URL}${url}`, {
         ...options,
         credentials: "include",
-        headers,
+        headers: retryHeaders,
       });
 
       if (!retryResponse.ok) {

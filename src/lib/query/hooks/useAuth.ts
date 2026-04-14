@@ -3,6 +3,7 @@
 import { getMe, signIn, signOut, signUp } from "@/lib/api/auth";
 import { queryKeys } from "@/lib/query/keys";
 import type { SignInBody, SignUpBody } from "@/lib/types";
+import { isSafeRedirect } from "@/lib/utils";
 import { useCsrfStore } from "@/stores/csrf.store";
 import { useGameWizardStore } from "@/stores/game-wizard.store";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -23,8 +24,8 @@ export function useSignIn() {
   return useMutation({
     mutationFn: (body: SignInBody) => signIn(body),
     onSuccess: () => {
-      const redirect = searchParams.get("redirect") ?? "/dashboard";
-      router.push(redirect);
+      const redirectParam = searchParams.get("redirect");
+      router.push(isSafeRedirect(redirectParam) ? redirectParam : "/dashboard");
     },
   });
 }

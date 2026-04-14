@@ -3,8 +3,37 @@ import { type NextRequest, NextResponse } from "next/server";
 // No auth check — always accessible
 const OPEN_PATHS = ["/", "/statistics"];
 
-// Redirect to dashboard if already has a session
+// Redirect to dashboard if already has a valid access_token
 const AUTH_PAGES = ["/auth/signin", "/auth/signup"];
+
+const isDev = process.env.NODE_ENV === "development";
+
+function buildCsp(nonce: string): string {
+  return [
+    "default-src 'self'",
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""}`,
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data:",
+    "connect-src 'self'",
+    "font-src 'self'",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'none'",
+  ].join("; ");
+}
+
+function nextWithNonce(
+  request: NextRequest,
+  nonce: string,
+  csp: string,
+): NextResponse {
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-nonce", nonce);
+  const response = NextResponse.next({ request: { headers: requestHeaders } });
+  response.headers.set("Content-Security-Policy", csp);
+  return response;
+}
 
 /**
  * The proxy only checks cookie *presence*, not validity.
@@ -15,8 +44,11 @@ const AUTH_PAGES = ["/auth/signin", "/auth/signup"];
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
+  const csp = buildCsp(nonce);
+
   if (OPEN_PATHS.includes(pathname)) {
-    return NextResponse.next();
+    return nextWithNonce(request, nonce, csp);
   }
 
   const hasAccessToken = request.cookies.has("access_token");
@@ -30,7 +62,12 @@ export async function proxy(request: NextRequest) {
     if (hasAccessToken) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
-    return NextResponse.next();
+    return nextWithNonce(request, nonce, csp);
+  }
+
+  // All other /auth/* paths (e.g. /auth/verify-email) are publicly accessible
+  if (pathname.startsWith("/auth/")) {
+    return nextWithNonce(request, nonce, csp);
   }
 
   // Protected pages — redirect only if no session at all
@@ -40,18 +77,19 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  return NextResponse.next();
+  return nextWithNonce(request, nonce, csp);
 }
 
 export const config = {
   matcher: [
-    "/",
-    "/auth/signin",
-    "/auth/signup",
-    "/statistics",
-    "/dashboard",
-    "/game/:path*",
-    "/statistics/me",
-    "/friends",
+    {
+      // Run on all routes except API, static assets, and image optimization
+      source: "/((?!api|_next/static|_next/image|favicon.ico).*)",
+      // Skip Next.js prefetch requests — they don't render a page
+      missing: [
+        { type: "header", key: "next-router-prefetch" },
+        { type: "header", key: "purpose", value: "prefetch" },
+      ],
+    },
   ],
 };

@@ -1,5 +1,6 @@
 "use client"
 
+import { isSafeRedirect } from "@/lib/utils"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 
@@ -38,8 +39,8 @@ export function SessionGate({ children }: { children: React.ReactNode }) {
           return
         }
 
-        const redirect = searchParams.get("redirect") ?? "/dashboard"
-        router.replace(redirect)
+        const redirectParam = searchParams.get("redirect")
+        router.replace(isSafeRedirect(redirectParam) ? redirectParam : "/dashboard")
       })
       .catch(() => setChecked(true))
   }, [router, searchParams, pathname])
