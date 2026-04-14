@@ -126,6 +126,8 @@ export const POINT_TYPE_META: Record<PointTypeId, PointTypeMeta> = {
 export interface AuthUser {
   userId: string;
   emailVerified: boolean;
+  name?: string | null;
+  email?: string;
 }
 
 export interface SafeUser {

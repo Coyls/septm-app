@@ -1,22 +1,6 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Skeleton } from "@/components/ui/skeleton"
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,35 +11,60 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { formatDate, getErrorMessage } from "@/lib/utils"
-import { AppError } from "@/lib/types"
-import { sendFriendRequestSchema, type SendFriendRequestSchema } from "@/lib/schemas/friends.schema"
+} from "@/components/ui/alert-dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  useAcceptRequest,
+  useCancelRequest,
   useFriends,
   useReceivedRequests,
-  useSentRequests,
-  useSendFriendRequest,
-  useAcceptRequest,
   useRejectRequest,
-  useCancelRequest,
   useRemoveFriend,
-} from "@/lib/query/hooks/useFriends"
+  useSendFriendRequest,
+  useSentRequests,
+} from "@/lib/query/hooks/useFriends";
+import {
+  sendFriendRequestSchema,
+  type SendFriendRequestSchema,
+} from "@/lib/schemas/friends.schema";
+import { AppError } from "@/lib/types";
+import { formatDate, getErrorMessage } from "@/lib/utils";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 
-function FriendAvatar({ name, image }: { name?: string | null; image?: string | null }) {
-  const initials = name ? name.slice(0, 2).toUpperCase() : "?"
+function FriendAvatar({
+  name,
+  image,
+}: {
+  name?: string | null;
+  image?: string | null;
+}) {
+  const initials = name ? name.slice(0, 2).toUpperCase() : "?";
   return (
     <Avatar className="h-8 w-8">
       {image && <AvatarImage src={image} />}
       <AvatarFallback className="text-xs">{initials}</AvatarFallback>
     </Avatar>
-  )
+  );
 }
 
 function FriendsTab() {
-  const { data: friends, isLoading } = useFriends()
-  const { mutate: remove, isPending: removing } = useRemoveFriend()
+  const { data: friends, isLoading } = useFriends();
+  const { mutate: remove, isPending: removing } = useRemoveFriend();
 
   if (isLoading) {
     return (
@@ -64,7 +73,7 @@ function FriendsTab() {
           <Skeleton key={i} className="h-14 w-full" />
         ))}
       </div>
-    )
+    );
   }
 
   if (!friends?.length) {
@@ -72,7 +81,7 @@ function FriendsTab() {
       <p className="text-sm text-muted-foreground py-4">
         Vous n&apos;avez pas encore d&apos;amis.
       </p>
-    )
+    );
   }
 
   return (
@@ -96,7 +105,9 @@ function FriendsTab() {
 
           <AlertDialog>
             <AlertDialogTrigger
-              render={<Button variant="outline" size="sm" disabled={removing} />}
+              render={
+                <Button variant="outline" size="sm" disabled={removing} />
+              }
             >
               Retirer
             </AlertDialogTrigger>
@@ -119,13 +130,13 @@ function FriendsTab() {
         </div>
       ))}
     </div>
-  )
+  );
 }
 
 function ReceivedTab() {
-  const { data: received, isLoading } = useReceivedRequests()
-  const { mutate: accept, isPending: accepting } = useAcceptRequest()
-  const { mutate: reject, isPending: rejecting } = useRejectRequest()
+  const { data: received, isLoading } = useReceivedRequests();
+  const { mutate: accept, isPending: accepting } = useAcceptRequest();
+  const { mutate: reject, isPending: rejecting } = useRejectRequest();
 
   if (isLoading) {
     return (
@@ -134,7 +145,7 @@ function ReceivedTab() {
           <Skeleton key={i} className="h-14 w-full" />
         ))}
       </div>
-    )
+    );
   }
 
   if (!received?.length) {
@@ -142,7 +153,7 @@ function ReceivedTab() {
       <p className="text-sm text-muted-foreground py-4">
         Aucune demande en attente.
       </p>
-    )
+    );
   }
 
   return (
@@ -184,35 +195,35 @@ function ReceivedTab() {
         </div>
       ))}
     </div>
-  )
+  );
 }
 
 function InviteTab() {
-  const { data: sent, isLoading: sentLoading } = useSentRequests()
-  const { mutate: sendRequest, isPending } = useSendFriendRequest()
-  const { mutate: cancel } = useCancelRequest()
-  const [inlineError, setInlineError] = useState<string | null>(null)
+  const { data: sent, isLoading: sentLoading } = useSentRequests();
+  const { mutate: sendRequest, isPending } = useSendFriendRequest();
+  const { mutate: cancel } = useCancelRequest();
+  const [inlineError, setInlineError] = useState<string | null>(null);
 
   const form = useForm<SendFriendRequestSchema>({
     resolver: zodResolver(sendFriendRequestSchema),
     defaultValues: { receiverId: "" },
-  })
+  });
 
   function onSubmit(data: SendFriendRequestSchema) {
-    setInlineError(null)
+    setInlineError(null);
     sendRequest(
       { receiverId: data.receiverId },
       {
         onSuccess: () => form.reset(),
         onError: (err) => {
           if (err instanceof AppError) {
-            setInlineError(getErrorMessage(err.code))
+            setInlineError(getErrorMessage(err.code));
           } else {
-            setInlineError("Une erreur est survenue.")
+            setInlineError("Une erreur est survenue.");
           }
         },
       },
-    )
+    );
   }
 
   return (
@@ -234,10 +245,7 @@ function InviteTab() {
                 <FormItem className="flex-1">
                   <FormLabel className="sr-only">ID utilisateur</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="ID de l'utilisateur"
-                      {...field}
-                    />
+                    <Input placeholder="ID de l'utilisateur" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -249,7 +257,8 @@ function InviteTab() {
           </form>
         </Form>
         <p className="text-xs text-muted-foreground mt-2">
-          L&apos;ID utilisateur est visible sur le tableau de bord de chaque membre.
+          L&apos;ID utilisateur est visible sur le tableau de bord de chaque
+          membre.
         </p>
       </div>
 
@@ -298,23 +307,23 @@ function InviteTab() {
         )}
       </div>
     </div>
-  )
+  );
 }
 
 export default function FriendsPage() {
-  const { data: received } = useReceivedRequests()
-  const pendingCount = received?.length ?? 0
+  const { data: received } = useReceivedRequests();
+  const pendingCount = received?.length ?? 0;
 
   return (
     <div className="max-w-2xl mx-auto space-y-4">
       <h1 className="text-2xl font-bold">Amis</h1>
 
       <Tabs defaultValue="friends">
-        <TabsList className="w-full">
-          <TabsTrigger value="friends" className="flex-1">
+        <TabsList className="w-full ">
+          <TabsTrigger value="friends" className="flex-1 cursor-pointer">
             Mes amis
           </TabsTrigger>
-          <TabsTrigger value="received" className="flex-1 gap-2">
+          <TabsTrigger value="received" className="flex-1 gap-2 cursor-pointer">
             Demandes reçues
             {pendingCount > 0 && (
               <Badge variant="destructive" className="h-5 px-1.5 text-xs">
@@ -322,7 +331,7 @@ export default function FriendsPage() {
               </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="invite" className="flex-1">
+          <TabsTrigger value="invite" className="flex-1 cursor-pointer">
             Inviter
           </TabsTrigger>
         </TabsList>
@@ -338,5 +347,5 @@ export default function FriendsPage() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }
