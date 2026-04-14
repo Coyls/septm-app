@@ -35,7 +35,7 @@ export function useSignUp() {
   return useMutation({
     mutationFn: (body: SignUpBody) => signUp(body),
     onSuccess: () => {
-      router.push("/dashboard");
+      router.push("/dashboard?newAccount=true");
     },
   });
 }

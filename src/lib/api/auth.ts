@@ -30,3 +30,11 @@ export function signOut(): Promise<true> {
 export function getCsrfToken(): Promise<{ csrfToken: string }> {
   return apiFetch("/csrf");
 }
+
+export function verifyEmail(token: string): Promise<{ success: boolean }> {
+  return apiFetch(`/auth/verify-email?token=${encodeURIComponent(token)}`);
+}
+
+export function resendVerification(): Promise<{ success: true }> {
+  return apiFetch("/auth/resend-verification", { method: "POST" });
+}

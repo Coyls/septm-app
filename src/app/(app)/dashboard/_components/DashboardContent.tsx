@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { PlusCircle, Users, Trophy, BarChart2, Copy, Check } from "lucide-react"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -12,6 +12,8 @@ import { useMe } from "@/lib/query/hooks/useAuth"
 import { useMyStats } from "@/lib/query/hooks/useStatistics"
 import { useReceivedRequests } from "@/lib/query/hooks/useFriends"
 import { formatWinRate, formatScore, cn } from "@/lib/utils"
+import { useSearchParams, useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 export function DashboardContent() {
   const { data: meData, isLoading: meLoading } = useMe()
@@ -19,6 +21,16 @@ export function DashboardContent() {
   const { data: received } = useReceivedRequests()
 
   const [copied, setCopied] = useState(false)
+
+  const searchParams = useSearchParams()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (searchParams.get("newAccount") === "true") {
+      toast.info("Un email de confirmation a été envoyé, pensez à vérifier votre boîte mail.")
+      router.replace("/dashboard")
+    }
+  }, [searchParams, router])
 
   const userId = meData?.user?.userId
   const pendingCount = received?.length ?? 0
