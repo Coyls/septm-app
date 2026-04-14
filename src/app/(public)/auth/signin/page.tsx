@@ -35,14 +35,9 @@ function SignInForm() {
     setError(null);
     signIn(data, {
       onError: (err) => {
+        if (err instanceof AppError && err.status === 429) return;
         if (err instanceof AppError) {
-          if (err.status === 429) {
-            setError(
-              "Trop de tentatives. Veuillez patienter avant de réessayer.",
-            );
-          } else {
-            setError("Email ou mot de passe incorrect.");
-          }
+          setError("Email ou mot de passe incorrect.");
         } else {
           setError("Une erreur est survenue. Veuillez réessayer.");
         }

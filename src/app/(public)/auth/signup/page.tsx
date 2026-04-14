@@ -38,13 +38,8 @@ export default function SignUpPage() {
       { name: data.name, email: data.email, password: data.password },
       {
         onError: (err) => {
-          if (err instanceof AppError && err.status === 429) {
-            setError(
-              "Trop de tentatives. Veuillez patienter avant de réessayer.",
-            );
-          } else {
-            setError("Une erreur est survenue. Veuillez réessayer.");
-          }
+          if (err instanceof AppError && err.status === 429) return;
+          setError("Une erreur est survenue. Veuillez réessayer.");
         },
       },
     );

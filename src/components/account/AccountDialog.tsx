@@ -52,11 +52,8 @@ function AccountForm({ currentName }: AccountFormProps) {
         toast.success("Nom mis à jour.");
       },
       onError: (err) => {
-        if (err instanceof AppError && err.status === 429) {
-          toast.error("Trop de requêtes. Réessayez dans un moment.");
-        } else {
-          toast.error("Impossible de mettre à jour le nom.");
-        }
+        if (err instanceof AppError && err.status === 429) return;
+        toast.error("Impossible de mettre à jour le nom.");
       },
     });
   }
@@ -64,11 +61,8 @@ function AccountForm({ currentName }: AccountFormProps) {
   function handleDeleteAccount() {
     deleteAccount.mutate(undefined, {
       onError: (err) => {
-        if (err instanceof AppError && err.status === 429) {
-          toast.error("Trop de requêtes. Réessayez dans un moment.");
-        } else {
-          toast.error("Impossible de supprimer le compte.");
-        }
+        if (err instanceof AppError && err.status === 429) return;
+        toast.error("Impossible de supprimer le compte.");
       },
     });
   }

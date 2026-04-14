@@ -9,9 +9,16 @@ const AUTH_PAGES = ["/auth/signin", "/auth/signup"];
 const isDev = process.env.NODE_ENV === "development";
 
 function buildCsp(nonce: string): string {
+  // In development, CSP must be permissive to allow Next.js HMR inline scripts.
+  // 'strict-dynamic' ignores 'unsafe-inline' in CSP Level 3, so we use a simple
+  // allow-all script policy in dev and switch to strict nonce-based in production.
+  const scriptSrc = isDev
+    ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+    : `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`;
+
   return [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""}`,
+    scriptSrc,
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data:",
     "connect-src 'self'",
@@ -27,9 +34,15 @@ function nextWithNonce(
   request: NextRequest,
   nonce: string,
   csp: string,
+  extra?: Record<string, string>,
 ): NextResponse {
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-nonce", nonce);
+  if (extra) {
+    for (const [key, value] of Object.entries(extra)) {
+      requestHeaders.set(key, value);
+    }
+  }
   const response = NextResponse.next({ request: { headers: requestHeaders } });
   response.headers.set("Content-Security-Policy", csp);
   return response;
@@ -51,6 +64,14 @@ export async function proxy(request: NextRequest) {
     return nextWithNonce(request, nonce, csp);
   }
 
+  // Static files (images, fonts, etc.) are served as-is — no auth check.
+  // Without this, Next.js Image Optimization's internal server-side fetch
+  // would be treated as an unauthenticated request and redirected to /auth/signin,
+  // causing the optimizer to receive HTML instead of the image binary.
+  if (/\.[a-zA-Z0-9]+$/.test(pathname)) {
+    return nextWithNonce(request, nonce, csp);
+  }
+
   const hasAccessToken = request.cookies.has("access_token");
   const hasRefreshToken = request.cookies.has("refresh_token");
   const hasSession = hasAccessToken || hasRefreshToken;
@@ -62,12 +83,19 @@ export async function proxy(request: NextRequest) {
     if (hasAccessToken) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
-    return nextWithNonce(request, nonce, csp);
+    // Pass refresh token presence to SessionGate via request headers.
+    // The Server Component layout reads this and skips the refresh call when false,
+    // avoiding a noisy 401 on pages visited without a session.
+    return nextWithNonce(request, nonce, csp, {
+      "x-has-refresh-token": hasRefreshToken ? "1" : "0",
+    });
   }
 
   // All other /auth/* paths (e.g. /auth/verify-email) are publicly accessible
   if (pathname.startsWith("/auth/")) {
-    return nextWithNonce(request, nonce, csp);
+    return nextWithNonce(request, nonce, csp, {
+      "x-has-refresh-token": hasRefreshToken ? "1" : "0",
+    });
   }
 
   // Protected pages — redirect only if no session at all

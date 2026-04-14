@@ -73,6 +73,7 @@ export function WonderPicker({
                   src={WONDER_IMAGE}
                   alt={selectedWonder.name}
                   fill
+                  sizes="36px"
                   className="object-cover opacity-80"
                 />
               </div>
@@ -122,6 +123,7 @@ export function WonderPicker({
                         src={WONDER_IMAGE}
                         alt={wonder.name}
                         fill
+                        sizes="(max-width: 640px) 15vw, 80px"
                         className={cn(
                           "object-cover",
                           isSelected ? "opacity-90" : "opacity-70",
