@@ -52,6 +52,10 @@
   -webkit-backdrop-filter: blur(16px);
 }
 
+.dark .lp-nav {
+  background: rgba(28, 22, 16, 0.90);
+}
+
 .lp-nav-logo {
   font-family: var(--font-cinzel), serif;
   font-size: 18px;
