@@ -9,16 +9,11 @@ const AUTH_PAGES = ["/auth/signin", "/auth/signup"];
 const isDev = process.env.NODE_ENV === "development";
 
 function buildCsp(nonce: string): string {
-  // In development, CSP must be permissive to allow Next.js HMR inline scripts.
-  // 'strict-dynamic' ignores 'unsafe-inline' in CSP Level 3, so we use a simple
-  // allow-all script policy in dev and switch to strict nonce-based in production.
-  const scriptSrc = isDev
-    ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
-    : `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`;
+  if (isDev) return "";
 
   return [
     "default-src 'self'",
-    scriptSrc,
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data:",
     "connect-src 'self'",
@@ -44,7 +39,7 @@ function nextWithNonce(
     }
   }
   const response = NextResponse.next({ request: { headers: requestHeaders } });
-  response.headers.set("Content-Security-Policy", csp);
+  if (csp) response.headers.set("Content-Security-Policy", csp);
   return response;
 }
 

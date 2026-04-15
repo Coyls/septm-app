@@ -1,10 +1,14 @@
+"use client";
+
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 import { buttonVariants } from "@/components/ui/button";
+import { useMePublic } from "@/lib/query/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
 export function LandingHero() {
+  const { data, isLoading } = useMePublic();
   return (
     <section className="lp-hero">
       <div className="lp-hero-grid" aria-hidden />
@@ -29,24 +33,40 @@ export function LandingHero() {
         </p>
 
         <div className="lp-hero-ctas lp-r4">
-          <Link
-            href="/auth/signup"
-            className={cn(
-              buttonVariants({ size: "lg" }),
-              "text-xs tracking-widest uppercase px-8",
-            )}
-          >
-            Créer un compte
-          </Link>
-          <Link
-            href="/auth/signin"
-            className={cn(
-              buttonVariants({ variant: "outline", size: "lg" }),
-              "text-xs tracking-widest uppercase",
-            )}
-          >
-            Se connecter
-          </Link>
+          {!isLoading && (
+            data ? (
+              <Link
+                href="/dashboard"
+                className={cn(
+                  buttonVariants({ size: "lg" }),
+                  "text-xs tracking-widest uppercase px-8",
+                )}
+              >
+                Dashboard
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/auth/signup"
+                  className={cn(
+                    buttonVariants({ size: "lg" }),
+                    "text-xs tracking-widest uppercase px-8",
+                  )}
+                >
+                  Créer un compte
+                </Link>
+                <Link
+                  href="/auth/signin"
+                  className={cn(
+                    buttonVariants({ variant: "outline", size: "lg" }),
+                    "text-xs tracking-widest uppercase",
+                  )}
+                >
+                  Se connecter
+                </Link>
+              </>
+            )
+          )}
           <Link
             href="/statistics"
             className={cn(

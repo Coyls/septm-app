@@ -79,7 +79,6 @@
 /* ── Hero ── */
 .lp-hero {
   position: relative;
-  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -114,7 +113,7 @@
   top: 50%; left: 50%;
   transform: translate(-50%, -54%);
   font-family: var(--font-cinzel), serif;
-  font-size: clamp(180px, 30vw, 360px);
+  font-size: clamp(140px, 30vw, 360px);
   font-weight: 700;
   color: var(--primary);
   letter-spacing: 0.04em;
@@ -122,6 +121,7 @@
   opacity: 1;
   user-select: none;
   pointer-events: none;
+  overflow: hidden;
   animation: lp-breathe 8s ease-in-out infinite;
 }
 
@@ -173,6 +173,30 @@
   color: var(--muted-foreground);
   max-width: 460px;
   margin: 0 auto 40px;
+}
+
+@media (max-width: 600px) {
+  .lp-hero {
+    padding-top: 56px;
+    padding-bottom: 72px;
+    align-items: flex-start;
+  }
+
+  .lp-hero-h1 {
+    font-size: clamp(32px, 9vw, 44px);
+    margin-bottom: 16px;
+  }
+
+  .lp-badge {
+    margin-bottom: 20px;
+  }
+
+  .lp-hero-sub {
+    font-size: 14px;
+    margin-bottom: 28px;
+  }
+
+  .lp-scroll-hint { display: none; }
 }
 
 .lp-hero-ctas {
@@ -269,6 +293,10 @@
   padding: 88px clamp(20px, 5vw, 56px);
   max-width: 1160px;
   margin: 0 auto;
+}
+
+@media (max-width: 600px) {
+  .lp-section { padding-top: 56px; padding-bottom: 56px; }
 }
 
 .lp-section-tag {
@@ -542,6 +570,15 @@
   gap: 14px;
 }
 
+@media (max-width: 600px) {
+  .lp-footer {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+  }
+}
+
 .lp-footer-logo {
   font-family: var(--font-cinzel), serif;
   font-size: 14px;
@@ -594,6 +631,15 @@
   .lp-oss-inner {
     grid-template-columns: 1fr;
     gap: 48px;
+  }
+
+  .lp-oss-right { display: none; }
+}
+
+@media (max-width: 600px) {
+  .lp-oss-inner {
+    padding-top: 64px;
+    padding-bottom: 64px;
   }
 }
 
@@ -677,11 +723,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 0;
 }
 
 .lp-oss-card {
   width: 100%;
   max-width: 440px;
+  min-width: 0;
   border-radius: 12px;
   border: 1px solid rgba(184, 103, 61, 0.18);
   overflow: hidden;

@@ -20,7 +20,6 @@ import {
   Menu,
   PlusCircle,
   Trophy,
-  User,
   Users,
 } from "lucide-react";
 import Link from "next/link";
@@ -35,8 +34,7 @@ const navItems = [
     icon: PlusCircle,
     accent: true,
   },
-  { href: "/statistics", label: "Statistiques", icon: BarChart2 },
-  { href: "/statistics/me", label: "Mes statistiques", icon: User },
+  { href: "/statistics/me", label: "Mes statistiques", icon: BarChart2 },
 ];
 
 export function MobileHeader({ className }: { className?: string }) {

@@ -36,7 +36,7 @@ const navItems = [
     accent: true,
   },
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/statistics/me", label: "Statistiques", icon: BarChart2 },
+  { href: "/statistics/me", label: "Mes statistiques", icon: BarChart2 },
 ];
 
 function getInitial(name?: string | null): string {
