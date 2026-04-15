@@ -48,123 +48,124 @@
 }
 
 :root {
-  /* ── SEPTM — Mineral & Ancient theme ──────────────────────────────────
+  /* ── SEPTM — Parchemin & Terracotta ──────────────────────────────────
      Palette :
-       background  #161311  quasi-noir chaud, brun profond
-       foreground  #E8DDC9  ivoire cassé, jamais blanc pur
-       card        #26211D  pierre sombre, marbre usé
-       primary     #C6A15B  or vieilli, pas saturé
-       secondary   #312A24  terre brûlée
-       accent      #8C6742  bronze / cuivre patiné
-       muted-fg    #9C8F7D  gris chaud, calcaire
-       border      #4A4037  pierre grise, discrète
-       destructive #9A4E42  rouille / brique ocre
+       background  #F8F2E6  parchemin chaud / papier vieilli
+       foreground  #2A1E12  brun espresso foncé
+       card        #FDF9F2  blanc cassé chaud
+       primary     #B8673D  terracotta, chaleureux
+       secondary   #EDE4D3  beige doux
+       accent      #6B7C50  olive / sauge
+       muted-fg    #7A6248  brun moyen chaud
+       border      #D8CCBA  bordure visible et douce
+       destructive #B8443A  brique rouge chaud
   ────────────────────────────────────────────────────────────────────── */
 
-  --background:            #161311;
-  --foreground:            #E8DDC9;
+  --background:            #F8F2E6;
+  --foreground:            #2A1E12;
 
-  --card:                  #26211D;
-  --card-foreground:       #E8DDC9;
+  --card:                  #FDF9F2;
+  --card-foreground:       #2A1E12;
 
-  /* Popover légèrement plus sombre que card pour donner de la profondeur */
-  --popover:               #1E1A17;
-  --popover-foreground:    #E8DDC9;
+  --popover:               #FDF9F2;
+  --popover-foreground:    #2A1E12;
 
-  --primary:               #C6A15B;  /* or vieilli */
-  --primary-foreground:    #161311;
+  --primary:               #B8673D;  /* terracotta */
+  --primary-foreground:    #FFF8F2;
 
-  --secondary:             #312A24;  /* terre brûlée */
-  --secondary-foreground:  #E8DDC9;
+  --secondary:             #EDE4D3;  /* beige doux */
+  --secondary-foreground:  #2A1E12;
 
-  /* Muted : surface intermédiaire entre card et secondary */
-  --muted:                 #2B2420;
-  --muted-foreground:      #9C8F7D;
+  --muted:                 #E6DCC8;
+  --muted-foreground:      #7A6248;
 
-  --accent:                #8C6742;  /* bronze / cuivre */
-  --accent-foreground:     #E8DDC9;
+  --accent:                #6B7C50;  /* olive */
+  --accent-foreground:     #F8F2E6;
 
-  --destructive:           #9A4E42;  /* rouille */
-  --destructive-foreground: #E8DDC9;
+  --destructive:           #B8443A;
+  --destructive-foreground: #FFF8F2;
 
-  --border:                #4A4037;
-  --input:                 #4A4037;
-  --ring:                  #C6A15B;
+  --border:                #D8CCBA;
+  --input:                 #D8CCBA;
+  --ring:                  #B8673D;
 
-  /* Patine olive, pour les états de succès */
   --success:               #6B7C50;
 
   /* ── Typographie — couleurs de texte ──────────────────────────────────── */
-  --text-primary:          #E8DDC9;  /* ivoire, texte principal */
-  --text-secondary:        #B9AC96;  /* beige désaturé, texte secondaire */
-  --text-weak:             #8E8273;  /* brun/gris, texte faible */
+  --text-primary:          #2A1E12;  /* brun foncé, texte principal */
+  --text-secondary:        #6B5438;  /* brun medium, texte secondaire */
+  --text-weak:             #9C876A;  /* brun clair, texte faible */
 
-  /* Rayon légèrement plus serré — sobriété architecturale */
-  --radius:                0.45rem;
+  /* Rayon légèrement plus généreux — convivialité */
+  --radius:                0.55rem;
 
   /* ── Charts — palette chaude et cohérente ───────────────────────────── */
-  --chart-1:               #C6A15B;  /* or */
-  --chart-2:               #8C6742;  /* bronze */
-  --chart-3:               #6B7C50;  /* olive / patine */
-  --chart-4:               #B87D5A;  /* terracotta */
-  --chart-5:               #9A4E42;  /* rouille */
+  --chart-1:               #B8673D;  /* terracotta */
+  --chart-2:               #6B7C50;  /* olive */
+  --chart-3:               #5C7A8E;  /* bleu ardoise */
+  --chart-4:               #C6A15B;  /* or pâle */
+  --chart-5:               #B8443A;  /* brique */
 
-  /* ── Sidebar — un cran plus sombre que le fond général ─────────────── */
-  --sidebar:               #1E1A17;
-  --sidebar-foreground:    #E8DDC9;
-  --sidebar-primary:       #C6A15B;
-  --sidebar-primary-foreground: #161311;
-  --sidebar-accent:        #312A24;
-  --sidebar-accent-foreground: #E8DDC9;
-  --sidebar-border:        #3A332B;
-  --sidebar-ring:          #C6A15B;
+  /* ── Sidebar ─────────────────────────────────────────────────────── */
+  --sidebar:               #F0E8D8;
+  --sidebar-foreground:    #2A1E12;
+  --sidebar-primary:       #B8673D;
+  --sidebar-primary-foreground: #FFF8F2;
+  --sidebar-accent:        #E6DCC8;
+  --sidebar-accent-foreground: #2A1E12;
+  --sidebar-border:        #D8CCBA;
+  --sidebar-ring:          #B8673D;
 }
 
 .dark {
-  --background:            #161311;
-  --foreground:            #E8DDC9;
+  --background:            #1C1610;
+  --foreground:            #EDE4D3;
 
-  --card:                  #26211D;
-  --card-foreground:       #E8DDC9;
+  --card:                  #251D15;
+  --card-foreground:       #EDE4D3;
 
-  --popover:               #1E1A17;
-  --popover-foreground:    #E8DDC9;
+  --popover:               #1C1610;
+  --popover-foreground:    #EDE4D3;
 
-  --primary:               #C6A15B;
-  --primary-foreground:    #161311;
+  --primary:               #C07A52;  /* terracotta éclairci pour fond sombre */
+  --primary-foreground:    #1C1610;
 
-  --secondary:             #312A24;
-  --secondary-foreground:  #E8DDC9;
+  --secondary:             #2E2418;
+  --secondary-foreground:  #EDE4D3;
 
-  --muted:                 #2B2420;
-  --muted-foreground:      #9C8F7D;
+  --muted:                 #2A2018;
+  --muted-foreground:      #9C876A;
 
-  --accent:                #8C6742;
-  --accent-foreground:     #E8DDC9;
+  --accent:                #7A8E5C;
+  --accent-foreground:     #EDE4D3;
 
-  --destructive:           #9A4E42;
-  --destructive-foreground: #E8DDC9;
+  --destructive:           #B8443A;
+  --destructive-foreground: #EDE4D3;
 
-  --border:                #4A4037;
-  --input:                 #4A4037;
-  --ring:                  #C6A15B;
+  --border:                #3D3228;
+  --input:                 #3D3228;
+  --ring:                  #C07A52;
 
-  --success:               #6B7C50;
+  --success:               #7A8E5C;
 
-  --chart-1:               #C6A15B;
-  --chart-2:               #8C6742;
-  --chart-3:               #6B7C50;
-  --chart-4:               #B87D5A;
-  --chart-5:               #9A4E42;
+  --text-primary:          #EDE4D3;
+  --text-secondary:        #B9A98A;
+  --text-weak:             #8E7A5E;
 
-  --sidebar:               #1E1A17;
-  --sidebar-foreground:    #E8DDC9;
-  --sidebar-primary:       #C6A15B;
-  --sidebar-primary-foreground: #161311;
-  --sidebar-accent:        #312A24;
-  --sidebar-accent-foreground: #E8DDC9;
-  --sidebar-border:        #3A332B;
-  --sidebar-ring:          #C6A15B;
+  --chart-1:               #C07A52;
+  --chart-2:               #7A8E5C;
+  --chart-3:               #6890A8;
+  --chart-4:               #C6A15B;
+  --chart-5:               #B8443A;
+
+  --sidebar:               #181210;
+  --sidebar-foreground:    #EDE4D3;
+  --sidebar-primary:       #C07A52;
+  --sidebar-primary-foreground: #1C1610;
+  --sidebar-accent:        #2E2418;
+  --sidebar-accent-foreground: #EDE4D3;
+  --sidebar-border:        #3D3228;
+  --sidebar-ring:          #C07A52;
 }
 
 @layer base {
@@ -178,8 +179,7 @@
   }
   h1, h2, h3 {
     font-family: var(--font-cinzel), ui-serif, serif;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    letter-spacing: 0.02em;
     line-height: 1.2;
   }
 }

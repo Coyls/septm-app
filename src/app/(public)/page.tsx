@@ -1,290 +1,271 @@
-import Link from "next/link"
-import { BarChart2, Trophy, Users } from "lucide-react"
-import { buttonVariants } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import "./landing.css";
+
+import { ArrowRight, BarChart2, Trophy, Users } from "lucide-react";
+import Link from "next/link";
+
+import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export default function LandingPage() {
   return (
-    <>
-      <style>{`
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to   { opacity: 1; }
-        }
-        @keyframes pulse-gold {
-          0%, 100% { opacity: 0.035; }
-          50%       { opacity: 0.065; }
-        }
-        .fade-up   { animation: fadeUp 0.75s cubic-bezier(.22,.68,0,1.1) both; opacity: 0; }
-        .fade-in   { animation: fadeIn 1s ease both; opacity: 0; }
-        .d1 { animation-delay: 0.05s; }
-        .d2 { animation-delay: 0.18s; }
-        .d3 { animation-delay: 0.32s; }
-        .d4 { animation-delay: 0.46s; }
-        .d5 { animation-delay: 0.60s; }
-        .d6 { animation-delay: 0.74s; }
-        .d7 { animation-delay: 0.88s; }
+    <div className="lp">
+      {/* Grain */}
+      <div className="lp-grain" aria-hidden />
 
-        .feat-card {
-          position: relative;
-          background: var(--card);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-lg);
-          padding: 28px 24px;
-          transition: border-color 0.2s, transform 0.2s;
-        }
-        .feat-card::after {
-          content: '';
-          position: absolute;
-          inset: 0;
-          border-radius: inherit;
-          background: linear-gradient(135deg, rgba(198,161,91,0.04) 0%, transparent 60%);
-          pointer-events: none;
-        }
-        .feat-card:hover {
-          border-color: rgba(198,161,91,0.3);
-          transform: translateY(-2px);
-        }
-        .feat-card::before {
-          content: '';
-          position: absolute;
-          top: 0; left: 10%; right: 10%;
-          height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(198,161,91,0.5), transparent);
-        }
-
-        .grain-overlay {
-          position: fixed;
-          inset: 0;
-          pointer-events: none;
-          z-index: 100;
-          opacity: 0.04;
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
-          background-size: 220px;
-        }
-
-        .cta-primary {
-          letter-spacing: 0.06em;
-          font-size: 12px;
-          font-weight: 600;
-        }
-        .cta-secondary {
-          letter-spacing: 0.06em;
-          font-size: 12px;
-        }
-      `}</style>
-
-      <div className="grain-overlay" aria-hidden="true" />
-
-      <div className="w-full max-w-3xl px-6 py-16">
-
-        {/* ── HERO ── */}
-        <section className="relative text-center mb-24">
-
-          {/* Background VII */}
-          <div
-            aria-hidden="true"
-            style={{
-              position: 'absolute',
-              inset: 0,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              pointerEvents: 'none',
-              userSelect: 'none',
-              overflow: 'hidden',
-              animation: 'pulse-gold 5s ease-in-out infinite',
-            }}
+      {/* ── NAV ── */}
+      <nav className="lp-nav lp-f1">
+        <Link href="/" className="lp-nav-logo">
+          SEPT<em>M</em>
+        </Link>
+        <div className="lp-nav-right">
+          <Link
+            href="/statistics"
+            className={cn(
+              buttonVariants({ variant: "ghost", size: "sm" }),
+              "text-xs tracking-widest uppercase hidden sm:inline-flex",
+            )}
           >
-            <span style={{
-              fontSize: 'clamp(180px, 38vw, 340px)',
-              fontWeight: 900,
-              color: 'var(--primary)',
-              opacity: 1,
-              letterSpacing: '-0.04em',
-              lineHeight: 1,
-            }}>
-              VII
-            </span>
+            Stats
+          </Link>
+          <Link
+            href="/auth/signin"
+            className={cn(
+              buttonVariants({ variant: "ghost", size: "sm" }),
+              "text-xs",
+            )}
+          >
+            Connexion
+          </Link>
+          <Link
+            href="/auth/signup"
+            className={cn(
+              buttonVariants({ size: "sm" }),
+              "text-xs tracking-wider uppercase",
+            )}
+          >
+            Commencer
+          </Link>
+        </div>
+      </nav>
+
+      {/* ── HERO ── */}
+      <section className="lp-hero">
+        <div className="lp-hero-grid" aria-hidden />
+        <div className="lp-hero-glow" aria-hidden />
+        <div className="lp-hero-watermark lp-f2" aria-hidden>VII</div>
+
+        <div className="lp-hero-inner">
+          <div className="lp-badge lp-r1">
+            <span className="lp-badge-dot" />
+            7 Wonders · Gratuit & open source
           </div>
 
-          {/* Eyebrow */}
-          <div className="fade-in d1" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '14px', marginBottom: '32px' }}>
-            <div style={{ height: '1px', width: '48px', background: 'linear-gradient(90deg, transparent, var(--primary))' }} />
-            <span style={{
-              fontSize: '9px',
-              letterSpacing: '0.5em',
-              textTransform: 'uppercase',
-              color: 'var(--primary)',
-              fontWeight: 600,
-            }}>
-              7 Wonders · Score Tracker
-            </span>
-            <div style={{ height: '1px', width: '48px', background: 'linear-gradient(90deg, var(--primary), transparent)' }} />
-          </div>
-
-          {/* Title */}
-          <h1
-            className="fade-up d2"
-            style={{
-              fontSize: 'clamp(72px, 16vw, 136px)',
-              fontWeight: 900,
-              letterSpacing: '-0.045em',
-              lineHeight: 0.88,
-              marginBottom: '28px',
-              background: 'linear-gradient(175deg, #ffffff 30%, rgba(255,255,255,0.45) 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-            }}
-          >
-            SEPTM
+          <h1 className="lp-hero-h1 lp-r2">
+            Notez. Revivez.<br />
+            <span className="lp-gold">Recommencez.</span>
           </h1>
 
-          {/* Ornament */}
-          <div className="fade-in d3" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '24px' }}>
-            <div style={{ height: '1px', width: '32px', background: 'var(--border)' }} />
-            <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: 'var(--primary)', opacity: 0.7 }} />
-            <div style={{ height: '1px', width: '32px', background: 'var(--border)' }} />
-          </div>
-
-          {/* Subtitle */}
-          <p
-            className="fade-up d3"
-            style={{
-              fontSize: '17px',
-              lineHeight: 1.7,
-              color: 'var(--muted-foreground)',
-              maxWidth: '400px',
-              margin: '0 auto 40px',
-            }}
-          >
-            Enregistrez vos parties, analysez vos performances
-            et mesurez-vous à vos adversaires.
+          <p className="lp-hero-sub lp-r3">
+            SEPTM est un outil gratuit pour noter vos scores de 7 Wonders,
+            retrouver vos stats et vous souvenir de toutes vos soirées —
+            même celle que vous auriez préféré oublier.
           </p>
 
-          {/* CTAs */}
-          <div className="fade-up d4" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-            <Link href="/auth/signup" className={cn(buttonVariants({ size: "lg" }), "cta-primary")}>
-              COMMENCER
+          <div className="lp-hero-ctas lp-r4">
+            <Link
+              href="/auth/signup"
+              className={cn(
+                buttonVariants({ size: "lg" }),
+                "text-xs tracking-widest uppercase px-8",
+              )}
+            >
+              Créer un compte
             </Link>
-            <Link href="/auth/signin" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "cta-secondary")}>
-              SE CONNECTER
+            <Link
+              href="/auth/signin"
+              className={cn(
+                buttonVariants({ variant: "outline", size: "lg" }),
+                "text-xs tracking-widest uppercase",
+              )}
+            >
+              Se connecter
             </Link>
             <Link
               href="/statistics"
-              className="cta-secondary"
-              style={{
-                padding: '10px 20px',
-                fontSize: '12px',
-                letterSpacing: '0.06em',
-                color: 'var(--muted-foreground)',
-                transition: 'color 0.2s',
-                textDecoration: 'none',
-              }}
-              onMouseEnter={undefined}
+              className={cn(
+                buttonVariants({ variant: "ghost", size: "lg" }),
+                "text-xs tracking-widest uppercase",
+              )}
             >
-              STATISTIQUES GLOBALES →
+              Voir les stats <ArrowRight className="ml-1 h-3 w-3" />
             </Link>
           </div>
-        </section>
-
-        {/* ── DIVIDER ── */}
-        <div className="fade-in d5" style={{ display: 'flex', alignItems: 'center', gap: '0', marginBottom: '56px' }}>
-          <div style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, transparent, var(--border))' }} />
-          <div style={{
-            padding: '0 16px',
-            display: 'flex',
-            gap: '5px',
-            alignItems: 'center',
-          }}>
-            {[0, 1, 2].map(i => (
-              <div key={i} style={{
-                width: i === 1 ? '5px' : '3px',
-                height: i === 1 ? '5px' : '3px',
-                borderRadius: '50%',
-                background: i === 1 ? 'var(--primary)' : 'var(--border)',
-                opacity: i === 1 ? 0.8 : 1,
-              }} />
-            ))}
-          </div>
-          <div style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, var(--border), transparent)' }} />
         </div>
 
-        {/* ── FEATURES ── */}
-        <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginBottom: '64px' }}>
+        <div className="lp-scroll-hint lp-f3" aria-hidden>
+          <div className="lp-scroll-needle" />
+          <span>Défiler</span>
+        </div>
+      </section>
+
+      {/* ── STATS BAR ── */}
+      <div className="lp-stats">
+        {[
+          { n: "5",   sup: "", label: "Extensions supportées" },
+          { n: "24",  sup: "", label: "Merveilles jouables"   },
+          { n: "7",   sup: "", label: "Catégories de scores"  },
+          { n: "0 €", sup: "", label: "Pour toujours"         },
+        ].map(({ n, sup, label }) => (
+          <div key={label} className="lp-stat">
+            <div className="lp-stat-n">
+              {n}{sup && <sup>{sup}</sup>}
+            </div>
+            <div className="lp-stat-l">{label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── FEATURES ── */}
+      <section className="lp-section">
+        <div className="lp-section-tag">
+          <div className="lp-section-tag-bar" />
+          <span className="lp-section-tag-text">Ce que ça fait</span>
+        </div>
+        <h2 className="lp-section-h2">
+          Tout ce dont vous avez besoin,<br />rien de plus.
+        </h2>
+        <p className="lp-section-p">
+          Simple à prendre en main, pensé pour les soirées entre amis.
+          Pas de fioriture, pas de compte premium.
+        </p>
+
+        <div className="lp-feats">
           {[
             {
-              num: 'I',
+              num: "I",
               icon: Trophy,
-              title: 'Scores multi-extension',
-              desc: 'Vanilla, Leaders, Cities, Armada, Édifices — chaque catégorie de points, pour chaque extension.',
-              delay: 'd5',
+              title: "Scores multi-extension",
+              desc: "Vanilla, Leaders, Cities, Armada, Édifices — toutes les extensions sont là. Les points s'enregistrent catégorie par catégorie, fidèlement.",
+              chips: ["Vanilla", "Leaders", "Cities", "Armada", "Édifices"],
             },
             {
-              num: 'II',
+              num: "II",
               icon: BarChart2,
-              title: 'Statistiques avancées',
-              desc: 'Classements, tendances mensuelles, performance par merveille, compétitivité et distribution des scores.',
-              delay: 'd6',
+              title: "Statistiques lisibles",
+              desc: "Qui gagne le plus souvent à la maison ? Sur quelle merveille progressez-vous ? SEPTM répond sans avoir besoin d'ouvrir un tableur.",
+              chips: ["Classements", "Tendances", "Par merveille"],
             },
             {
-              num: 'III',
+              num: "III",
               icon: Users,
-              title: 'Réseau de joueurs',
-              desc: 'Retrouvez vos partenaires de jeu, gérez vos invitations et composez vos tables rapidement.',
-              delay: 'd7',
+              title: "Réseau de joueurs",
+              desc: "Retrouvez vos partenaires habituels, gérez les invitations et accédez à l'historique de vos soirées partagées en quelques secondes.",
+              chips: ["Invitations", "Tables", "Historique partagé"],
             },
-          ].map(({ num, icon: Icon, title, desc, delay }) => (
-            <div key={num} className={`feat-card fade-up ${delay}`}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '18px' }}>
-                <div style={{
-                  width: '38px',
-                  height: '38px',
-                  borderRadius: 'var(--radius-md)',
-                  background: 'rgba(198,161,91,0.08)',
-                  border: '1px solid rgba(198,161,91,0.18)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                }}>
-                  <Icon style={{ width: '16px', height: '16px', color: 'var(--primary)' }} />
-                </div>
-                <span style={{
-                  fontSize: '10px',
-                  fontWeight: 700,
-                  letterSpacing: '0.2em',
-                  color: 'rgba(198,161,91,0.3)',
-                }}>
-                  {num}
-                </span>
+          ].map(({ num, icon: Icon, title, desc, chips }) => (
+            <div key={num} className="lp-feat">
+              <div className="lp-feat-watermark" aria-hidden>{num}</div>
+              <div className="lp-feat-icon">
+                <Icon style={{ width: 17, height: 17, color: "var(--gold)" }} />
               </div>
-              <h3 style={{ fontSize: '14px', fontWeight: 600, marginBottom: '8px', color: 'var(--foreground)', letterSpacing: '-0.01em' }}>
-                {title}
-              </h3>
-              <p style={{ fontSize: '13px', lineHeight: 1.65, color: 'var(--muted-foreground)' }}>
-                {desc}
-              </p>
+              <div className="lp-feat-h3">{title}</div>
+              <p className="lp-feat-p">{desc}</p>
+              <div className="lp-chips">
+                {chips.map((c) => (
+                  <Badge key={c} className="lp-chip">{c}</Badge>
+                ))}
+              </div>
             </div>
           ))}
-        </section>
+        </div>
+      </section>
 
-        {/* ── FOOTER ── */}
-        <div className="fade-in d7" style={{ textAlign: 'center', paddingBottom: '16px' }}>
-          <p style={{ fontSize: '13px', color: 'var(--muted-foreground)', letterSpacing: '0.01em' }}>
-            Déjà un compte ?{' '}
-            <Link href="/auth/signin" style={{ color: 'var(--primary)', fontWeight: 500 }} className="hover:underline">
-              Se connecter
-            </Link>
-          </p>
+      {/* ── HOW IT WORKS ── */}
+      <div className="lp-hiw-wrap">
+        <div className="lp-section" style={{ paddingBottom: 0 }}>
+          <div className="lp-section-tag">
+            <div className="lp-section-tag-bar" />
+            <span className="lp-section-tag-text">Comment ça marche</span>
+          </div>
+          <h2 className="lp-section-h2">Simple comme une partie.</h2>
         </div>
 
+        <div style={{ maxWidth: 1160, margin: "0 auto" }}>
+          <div className="lp-steps">
+            {[
+              {
+                n: "01",
+                pill: "Étape 1",
+                title: "Créez une partie",
+                desc: "Donnez un nom à la soirée, ajoutez les joueurs présents et choisissez les extensions sur la table.",
+              },
+              {
+                n: "02",
+                pill: "Étape 2",
+                title: "Saisissez les scores",
+                desc: "Entrez les points catégorie par catégorie. Le total se calcule tout seul — plus besoin de calculette.",
+              },
+              {
+                n: "03",
+                pill: "Étape 3",
+                title: "Revivez la soirée",
+                desc: "Retrouvez l'historique, comparez d'une soirée à l'autre et voyez qui progresse vraiment.",
+              },
+            ].map(({ n, pill, title, desc }) => (
+              <div key={n} className="lp-step">
+                <div className="lp-step-num" aria-hidden>{n}</div>
+                <Badge className="lp-step-pill">{pill}</Badge>
+                <div className="lp-step-h3">{title}</div>
+                <p className="lp-step-p">{desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
-    </>
-  )
+
+      {/* ── CTA BLOCK ── */}
+      <section className="lp-cta">
+        <div className="lp-cta-glow" aria-hidden />
+        <h2 className="lp-cta-h2">
+          Essayez sur votre<br />
+          prochaine <span className="lp-gold">soirée.</span>
+        </h2>
+        <p className="lp-cta-p">
+          C&apos;est gratuit, sans engagement, et ça se prend en main en deux minutes.
+        </p>
+        <div className="lp-cta-btns">
+          <Link
+            href="/auth/signup"
+            className={cn(
+              buttonVariants({ size: "lg" }),
+              "text-xs tracking-widest uppercase px-10",
+            )}
+          >
+            Commencer gratuitement
+          </Link>
+          <Link
+            href="/statistics"
+            className={cn(
+              buttonVariants({ variant: "outline", size: "lg" }),
+              "text-xs tracking-widest uppercase",
+            )}
+          >
+            Voir les statistiques →
+          </Link>
+        </div>
+      </section>
+
+      {/* ── FOOTER ── */}
+      <footer className="lp-footer">
+        <Link href="/" className="lp-footer-logo">SEPTM</Link>
+        <nav className="lp-footer-links">
+          <Link href="/statistics" className="lp-footer-link">Statistiques</Link>
+          <Link href="/auth/signin" className="lp-footer-link">Connexion</Link>
+          <Link href="/auth/signup" className="lp-footer-link">Inscription</Link>
+        </nav>
+        <span className="lp-footer-copy">© 2026 SEPTM · 7 Wonders Score Tracker</span>
+      </footer>
+    </div>
+  );
 }

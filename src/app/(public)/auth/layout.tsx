@@ -11,7 +11,11 @@ export default async function AuthLayout({
 
   return (
     <Suspense fallback={null}>
-      <SessionGate hasRefreshToken={hasRefreshToken}>{children}</SessionGate>
+      <SessionGate hasRefreshToken={hasRefreshToken}>
+        <div className="min-h-screen flex items-center justify-center p-4">
+          {children}
+        </div>
+      </SessionGate>
     </Suspense>
   )
 }
