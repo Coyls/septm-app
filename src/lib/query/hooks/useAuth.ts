@@ -1,6 +1,6 @@
 "use client";
 
-import { getMe, signIn, signOut, signUp } from "@/lib/api/auth";
+import { getMe, getMePublic, signIn, signOut, signUp } from "@/lib/api/auth";
 import { queryKeys } from "@/lib/query/keys";
 import type { SignInBody, SignUpBody } from "@/lib/types";
 import { isSafeRedirect } from "@/lib/utils";
@@ -13,6 +13,14 @@ export function useMe() {
   return useQuery({
     queryKey: queryKeys.auth.me(),
     queryFn: getMe,
+    retry: false,
+  });
+}
+
+export function useMePublic() {
+  return useQuery({
+    queryKey: queryKeys.auth.me(),
+    queryFn: getMePublic,
     retry: false,
   });
 }

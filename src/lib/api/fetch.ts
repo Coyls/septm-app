@@ -38,7 +38,7 @@ function redirectToSignIn(): never {
 
 export async function apiFetch<T = unknown>(
   url: string,
-  options: RequestInit = {},
+  options: RequestInit & { noRedirect?: boolean } = {},
 ): Promise<T> {
   const csrfToken = useCsrfStore.getState().token;
   const method = (options.method?.toUpperCase() ?? "GET") as string;
@@ -102,6 +102,9 @@ export async function apiFetch<T = unknown>(
 
       return retryResponse.json() as Promise<T>;
     } else {
+      if (options.noRedirect) {
+        throw new AppError("UNAUTHORIZED", 401, "Non authentifié");
+      }
       // Refresh failed — clear state and redirect
       useCsrfStore.getState().clearToken();
       const { getQueryClient } = await import("@/lib/query/client");

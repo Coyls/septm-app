@@ -5,6 +5,10 @@ export function getMe(): Promise<{ user: AuthUser }> {
   return apiFetch("/auth/me");
 }
 
+export function getMePublic(): Promise<{ user: AuthUser }> {
+  return apiFetch("/auth/me", { noRedirect: true });
+}
+
 export function signIn(body: SignInBody): Promise<{ userId: string }> {
   return apiFetch("/auth/signin", {
     method: "POST",

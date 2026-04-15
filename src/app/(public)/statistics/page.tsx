@@ -1,6 +1,6 @@
-import { PublicFooter } from "@/components/layout/PublicFooter";
-import { PublicNav } from "@/components/layout/PublicNav";
-import { GlobalStatisticsContent } from "@/components/statistics/GlobalStatisticsContent";
+import { PublicFooter } from "@/components/layout/public-footer";
+import { PublicNav } from "@/components/layout/public-nav";
+import { GlobalStatisticsContent } from "@/components/statistics/global-statistics-content";
 
 export default function StatisticsPage() {
   return (

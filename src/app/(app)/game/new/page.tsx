@@ -2,10 +2,10 @@
 
 import { useGameWizardStore } from "@/stores/game-wizard.store";
 import { useEffect } from "react";
-import { ConfirmationStep } from "./_components/ConfirmationStep";
-import { ExtensionStep } from "./_components/ExtensionStep";
-import { PlayerStep } from "./_components/PlayerStep";
-import { WizardStepIndicator } from "./_components/WizardStepIndicator";
+import { ConfirmationStep } from "./_components/confirmation-step";
+import { ExtensionStep } from "./_components/extension-step";
+import { PlayerStep } from "./_components/player-step";
+import { WizardStepIndicator } from "./_components/wizard-step-indicator";
 
 export default function NewGamePage() {
   const { step } = useGameWizardStore();
