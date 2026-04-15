@@ -569,6 +569,179 @@
   letter-spacing: 0.04em;
 }
 
+/* ── Open source ── */
+.lp-oss-wrap {
+  background: #2A1E12;
+  border-top: 1px solid rgba(184, 103, 61, 0.15);
+  border-bottom: 1px solid rgba(184, 103, 61, 0.15);
+}
+
+.lp-oss-inner {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 88px clamp(20px, 5vw, 56px);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 72px;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .lp-oss-inner {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+}
+
+.lp-oss-tag {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.lp-oss-tag-bar {
+  width: 18px;
+  height: 1px;
+  background: #B8673D;
+}
+
+.lp-oss-tag-text {
+  font-size: 10.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #B8673D;
+  font-weight: 500;
+}
+
+.lp-oss-h2 {
+  font-family: var(--font-cinzel), serif;
+  font-size: clamp(36px, 5vw, 60px);
+  font-weight: 700;
+  line-height: 1.0;
+  letter-spacing: 0.01em;
+  color: #F8F2E6;
+  margin-bottom: 36px;
+}
+
+.lp-oss-pledges {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.lp-oss-pledge {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: rgba(248, 242, 230, 0.55);
+}
+
+.lp-oss-pledge-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #B8673D;
+  flex-shrink: 0;
+  margin-top: 8px;
+}
+
+.lp-oss-pledge strong {
+  color: #F8F2E6;
+  font-weight: 500;
+}
+
+.lp-oss-btn {
+  border-color: rgba(248, 242, 230, 0.20) !important;
+  color: rgba(248, 242, 230, 0.70) !important;
+  background: transparent !important;
+}
+
+.lp-oss-btn:hover {
+  border-color: rgba(184, 103, 61, 0.50) !important;
+  color: #B8673D !important;
+  background: rgba(184, 103, 61, 0.08) !important;
+}
+
+/* ── License card ── */
+.lp-oss-right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lp-oss-card {
+  width: 100%;
+  max-width: 440px;
+  border-radius: 12px;
+  border: 1px solid rgba(184, 103, 61, 0.18);
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.lp-oss-card-bar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 16px;
+  background: rgba(184, 103, 61, 0.10);
+  border-bottom: 1px solid rgba(184, 103, 61, 0.12);
+}
+
+.lp-oss-card-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  opacity: 0.6;
+}
+
+.lp-oss-card-filename {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 11px;
+  color: rgba(248, 242, 230, 0.35);
+  letter-spacing: 0.08em;
+  margin-left: auto;
+}
+
+.lp-oss-card-body {
+  padding: 20px 22px 24px;
+}
+
+.lp-oss-line {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 11.5px;
+  line-height: 1.75;
+  color: rgba(248, 242, 230, 0.35);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.lp-oss-line--bright {
+  color: rgba(248, 242, 230, 0.65);
+}
+
+.lp-oss-line--accent {
+  color: #B8673D;
+  font-weight: 600;
+}
+
+.lp-oss-line--muted {
+  color: transparent;
+  line-height: 0.5;
+}
+
+.lp-oss-kw {
+  color: #C6A15B;
+  font-weight: 600;
+  font-style: normal;
+}
+
 /* ── Grain overlay ── */
 .lp-grain {
   position: fixed;
