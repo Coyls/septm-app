@@ -1,6 +1,6 @@
 import "./landing.css";
 
-import { LandingNav } from "@/app/components/landing/LandingNav";
+import { PublicNav } from "@/components/layout/PublicNav";
 import { LandingHero } from "@/app/components/landing/LandingHero";
 import { LandingStats } from "@/app/components/landing/LandingStats";
 import { LandingFeatures } from "@/app/components/landing/LandingFeatures";
@@ -14,7 +14,7 @@ export default function LandingPage() {
     <div className="lp">
       <div className="lp-grain" aria-hidden />
 
-      <LandingNav />
+      <PublicNav />
       <LandingHero />
       <LandingStats />
       <LandingFeatures />
