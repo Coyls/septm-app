@@ -18,13 +18,16 @@ import { AppError } from "@/lib/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, Trophy } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
 
 function SignInForm() {
+  const searchParams = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { mutate: signIn, isPending } = useSignIn();
+  const passwordReset = searchParams.get("reset") === "true";
 
   const form = useForm<SignInSchema>({
     resolver: zodResolver(signInSchema),
@@ -55,6 +58,14 @@ function SignInForm() {
         <CardTitle>Connexion</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        {passwordReset && (
+          <Alert>
+            <AlertDescription>
+              Mot de passe réinitialisé avec succès. Vous pouvez vous connecter.
+            </AlertDescription>
+          </Alert>
+        )}
+
         {error && (
           <Alert variant="destructive">
             <AlertDescription>{error}</AlertDescription>
@@ -87,7 +98,16 @@ function SignInForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Mot de passe</FormLabel>
+                  <div className="flex items-center justify-between">
+                    <FormLabel>Mot de passe</FormLabel>
+                    <Link
+                      href="/auth/forgot-password"
+                      className="text-xs text-muted-foreground hover:underline"
+                      tabIndex={-1}
+                    >
+                      Mot de passe oublié ?
+                    </Link>
+                  </div>
                   <FormControl>
                     <div className="relative">
                       <Input
