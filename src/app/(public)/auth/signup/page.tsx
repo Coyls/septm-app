@@ -185,6 +185,18 @@ export default function SignUpPage() {
             Se connecter
           </Link>
         </p>
+
+        <p className="text-center text-xs text-muted-foreground">
+          En vous inscrivant, vous acceptez nos{" "}
+          <Link href="/terms" className="hover:underline">
+            conditions d&apos;utilisation
+          </Link>{" "}
+          et notre{" "}
+          <Link href="/privacy" className="hover:underline">
+            politique de confidentialité
+          </Link>
+          .
+        </p>
       </CardContent>
     </Card>
   );
