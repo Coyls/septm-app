@@ -1,5 +1,6 @@
 "use client";
 
+import * as Sentry from "@sentry/nextjs";
 import { useEffect } from "react";
 
 export default function GlobalError({
@@ -10,7 +11,7 @@ export default function GlobalError({
   unstable_retry: () => void;
 }) {
   useEffect(() => {
-    console.error(error);
+    Sentry.captureException(error);
   }, [error]);
 
   return (
@@ -40,7 +41,13 @@ export default function GlobalError({
           page.
         </p>
         {error.digest && (
-          <p style={{ fontFamily: "monospace", fontSize: "0.7rem", color: "#999" }}>
+          <p
+            style={{
+              fontFamily: "monospace",
+              fontSize: "0.7rem",
+              color: "#999",
+            }}
+          >
             {error.digest}
           </p>
         )}
