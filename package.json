@@ -1,7 +1,12 @@
 {
-  "name": "septm-frontend",
+  "name": "septm-app",
   "version": "0.1.0",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Coyls/septm-app"
+  },
+  "homepage": "https://septm.xyz",
   "private": true,
   "scripts": {
     "dev": "next dev --webpack --port 3001",

@@ -1,5 +1,7 @@
 # SEPTM — 7 Wonders Score Tracker
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+
 **SEPTM** is a free, open-source score tracker for the board game *7 Wonders*. Track your games, review stats, and manage your circle of players.
 
 → **Backend repository:** [septm-backend](https://github.com/Coyls/septm-backend)
