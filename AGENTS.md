@@ -1,5 +1,18 @@
-<!-- BEGIN:nextjs-agent-rules -->
-# This is NOT the Next.js you know
+# septm-app
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
-<!-- END:nextjs-agent-rules -->
+Next.js frontend for septm. **This Next.js version may have breaking changes vs your training data** — check `node_modules/next/dist/docs/` before writing code.
+
+## Stack
+TypeScript · pnpm · Tailwind CSS 4 · shadcn/ui · TanStack Query · Zustand · React Hook Form + Zod
+
+## Key conventions
+- All `/api/v1/*` calls go through the Next.js proxy (see `next.config.ts`) — never call the backend directly
+- `(public)/` — unauthenticated routes · `(app)/` — authenticated routes
+- Dev server runs on port 3001
+
+## Commands
+```
+pnpm dev        # port 3001
+pnpm build
+pnpm lint
+```

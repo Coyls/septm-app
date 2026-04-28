@@ -29,7 +29,7 @@ pnpm run lint          # lint and auto-fix
 
 ## Commit convention
 
-This project uses [Conventional Commits](https://www.conventionalcommits.org/). Use `pnpm run commit` (Commitizen) for an interactive prompt.
+This project uses [Conventional Commits](https://www.conventionalcommits.org/). Use `pnpm dlx cz` (Commitizen) for an interactive prompt.
 
 Common types: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`.
 
