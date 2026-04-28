@@ -21,7 +21,6 @@ import {
   LogOut,
   PlusCircle,
   Settings,
-  Trophy,
   Users,
 } from "lucide-react";
 import Link from "next/link";
@@ -67,9 +66,8 @@ export function Sidebar({ className }: { className?: string }) {
       >
         {/* Logo */}
         <div className="flex items-center gap-2 px-2 mb-6">
-          <Trophy className="h-6 w-6 text-primary" />
           <span className="font-heading font-bold text-lg tracking-widest uppercase">
-            SEPTM
+            SEPT<em className="text-primary not-italic">M</em>
           </span>
         </div>
 
