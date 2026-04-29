@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 // No auth check — always accessible
-const OPEN_PATHS = ["/", "/statistics"];
+const OPEN_PATHS = ["/", "/statistics", "/privacy", "/terms"];
 
 // Redirect to dashboard if already has a valid access_token
 const AUTH_PAGES = ["/auth/signin", "/auth/signup"];
@@ -55,7 +55,12 @@ export async function proxy(request: NextRequest) {
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
   const csp = buildCsp(nonce);
 
-  if (OPEN_PATHS.includes(pathname)) {
+  const normalizedPathname =
+    pathname !== "/" && pathname.endsWith("/")
+      ? pathname.slice(0, -1)
+      : pathname;
+
+  if (OPEN_PATHS.includes(normalizedPathname)) {
     return nextWithNonce(request, nonce, csp);
   }
 
