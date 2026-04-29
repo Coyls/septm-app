@@ -144,7 +144,7 @@ ThemeProvider
 - **Tailwind CSS 4** for utility classes.
 - **CSS variables**: `--font-sans` (Inter) and `--font-cinzel` (Cinzel) loaded via `next/font/google`.
 - **shadcn/ui** for component primitives — configured via `components.json`.
-- **Theme**: light only (`enableSystem: false`). Dark mode support not enabled.
+- **Theme**: light and dark, toggled manually from the account dialog (`useTheme`). `enableSystem: false` — the OS preference is ignored.
 
 ---
 

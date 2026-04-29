@@ -14,7 +14,7 @@
 - Detailed score entry and history
 - Personal and global statistics
 - Friends system
-- Dark / light mode
+- Light / dark mode
 
 ## Tech stack
 
