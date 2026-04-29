@@ -1,0 +1,62 @@
+"use client";
+
+import { isSafeRedirect } from "@/lib/utils";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "/api/v1";
+
+interface SessionGateProps {
+  children: React.ReactNode;
+  hasRefreshToken: boolean;
+}
+
+export function SessionGate({ children, hasRefreshToken }: SessionGateProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  // Start as already checked when there is no refresh token — no request needed.
+  // The proxy reads httpOnly cookies server-side and passes the result via x-has-refresh-token.
+  const [checked, setChecked] = useState(!hasRefreshToken);
+
+  useEffect(() => {
+    if (!hasRefreshToken) return;
+
+    fetch(`${API_URL}/auth/refresh`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          setChecked(true);
+          return;
+        }
+
+        if (pathname === "/auth/verify-email") {
+          const meRes = await fetch(`${API_URL}/auth/me`, {
+            credentials: "include",
+          });
+          if (meRes.ok) {
+            const data = await meRes.json();
+            if (data?.user?.emailVerified) {
+              router.replace("/dashboard");
+              return;
+            }
+          }
+          setChecked(true);
+          return;
+        }
+
+        const redirectParam = searchParams.get("redirect");
+        router.replace(
+          isSafeRedirect(redirectParam) ? redirectParam : "/dashboard",
+        );
+      })
+      .catch(() => setChecked(true));
+  }, [router, searchParams, pathname, hasRefreshToken]);
+
+  if (!checked) return null;
+
+  return <>{children}</>;
+}

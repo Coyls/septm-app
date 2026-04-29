@@ -125,6 +125,9 @@ export const POINT_TYPE_META: Record<PointTypeId, PointTypeMeta> = {
 
 export interface AuthUser {
   userId: string;
+  emailVerified: boolean;
+  name?: string | null;
+  email?: string;
 }
 
 export interface SafeUser {
@@ -145,6 +148,7 @@ export interface SignInBody {
 }
 
 export interface SignUpBody {
+  name: string;
   email: string;
   password: string;
 }
@@ -203,6 +207,7 @@ export interface CreateGameResponse {
   createdById: string;
   createdAt: string;
   updatedAt: string;
+  players: Array<{ id: string; name: string }>;
 }
 
 // Score

@@ -1,33 +1,37 @@
-import type { Metadata } from "next"
-import { Inter, Cinzel } from "next/font/google"
-import { ThemeProvider } from "next-themes"
-import { TooltipProvider } from "@/components/ui/tooltip"
-import { QueryProvider } from "@/components/layout/QueryProvider"
-import { CsrfProvider } from "@/components/layout/CsrfProvider"
-import { ToasterProvider } from "@/components/layout/ToasterProvider"
-import "./globals.css"
+import { CsrfProvider } from "@/components/providers/csrf-provider";
+import { QueryProvider } from "@/components/providers/query-provider";
+import { ToasterProvider } from "@/components/providers/toaster-provider";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import type { Metadata } from "next";
+import { ThemeProvider } from "next-themes";
+import { Cinzel, Inter } from "next/font/google";
+import { headers } from "next/headers";
+import "./globals.css";
 
 const inter = Inter({
   variable: "--font-sans",
   subsets: ["latin"],
-})
+});
 
 const cinzel = Cinzel({
   variable: "--font-cinzel",
   subsets: ["latin"],
   weight: ["400", "600", "700"],
-})
+});
 
 export const metadata: Metadata = {
-  title: "SEPTM — 7 Wonders Score Tracker",
-  description: "Suivez vos scores de 7 Wonders, consultez vos statistiques et gérez vos amis.",
-}
+  title: "SEPTM | 7 Wonders Score Tracker",
+  description:
+    "Suivez vos scores de 7 Wonders, consultez vos statistiques et gérez vos amis.",
+};
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
+
   return (
     <html
       lang="fr"
@@ -37,20 +41,19 @@ export default function RootLayout({
       <body className="min-h-full">
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="light"
           enableSystem={false}
           disableTransitionOnChange
+          nonce={nonce}
         >
           <QueryProvider>
             <CsrfProvider>
-              <TooltipProvider>
-                {children}
-              </TooltipProvider>
+              <TooltipProvider>{children}</TooltipProvider>
               <ToasterProvider />
             </CsrfProvider>
           </QueryProvider>
         </ThemeProvider>
       </body>
     </html>
-  )
+  );
 }

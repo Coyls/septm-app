@@ -2,13 +2,17 @@ import { create } from "zustand"
 import { persist, createJSONStorage } from "zustand/middleware"
 import type { ExtensionId, WonderId, Side } from "@/lib/types"
 
+export type WizardPlayerType = "friend" | "guest" | null
+
 export interface WizardPlayer {
   id: string
+  playerType: WizardPlayerType
   name: string
   userId?: string
   email?: string
   wonderId: WonderId | null
   wonderSide: Side
+  backendPlayerId?: string
 }
 
 interface GameWizardState {
@@ -18,11 +22,13 @@ interface GameWizardState {
   createdGameId: string | null
 
   setStep: (step: 1 | 2 | 3) => void
+  initSelfPlayer: (userId: string) => void
   addPlayer: () => void
   removePlayer: (id: string) => void
   updatePlayer: (id: string, updates: Partial<Omit<WizardPlayer, "id">>) => void
   toggleExtension: (extensionId: ExtensionId) => void
   setCreatedGameId: (id: string) => void
+  setBackendPlayerIds: (backendPlayers: Array<{ id: string; name: string }>) => void
   reset: () => void
 }
 
@@ -40,12 +46,40 @@ export const useGameWizardStore = create<GameWizardState>()(
 
       setStep: (step) => set({ step }),
 
+      initSelfPlayer: (userId) =>
+        set((state) => {
+          if (state.players.length === 0) {
+            return {
+              players: [
+                {
+                  id: crypto.randomUUID(),
+                  playerType: "friend" as const,
+                  name: "",
+                  userId,
+                  wonderId: null,
+                  wonderSide: "A",
+                },
+              ],
+            }
+          }
+          // Fix stale player 0 if userId or playerType is wrong
+          const [self, ...rest] = state.players
+          if (self.userId === userId && self.playerType === "friend") return state
+          return {
+            players: [
+              { ...self, playerType: "friend" as const, userId },
+              ...rest,
+            ],
+          }
+        }),
+
       addPlayer: () =>
         set((state) => ({
           players: [
             ...state.players,
             {
               id: crypto.randomUUID(),
+              playerType: null,
               name: "",
               wonderId: null,
               wonderSide: "A",
@@ -77,6 +111,15 @@ export const useGameWizardStore = create<GameWizardState>()(
         }),
 
       setCreatedGameId: (id) => set({ createdGameId: id }),
+
+      // Map backend player IDs by index (backend preserves creation order)
+      setBackendPlayerIds: (backendPlayers) =>
+        set((state) => ({
+          players: state.players.map((p, idx) => ({
+            ...p,
+            backendPlayerId: backendPlayers[idx]?.id ?? p.backendPlayerId,
+          })),
+        })),
 
       reset: () => set(initialState),
     }),

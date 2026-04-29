@@ -8,10 +8,14 @@ let refreshQueue: Array<(success: boolean) => void> = [];
 
 async function doRefresh(): Promise<boolean> {
   try {
+    const csrfToken = useCsrfStore.getState().token;
     const res = await fetch(`${API_URL}/auth/refresh`, {
       method: "POST",
       credentials: "include",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(csrfToken ? { "x-csrf-token": csrfToken } : {}),
+      },
     });
     return res.ok;
   } catch {
@@ -34,7 +38,7 @@ function redirectToSignIn(): never {
 
 export async function apiFetch<T = unknown>(
   url: string,
-  options: RequestInit = {},
+  options: RequestInit & { noRedirect?: boolean } = {},
 ): Promise<T> {
   const csrfToken = useCsrfStore.getState().token;
   const method = (options.method?.toUpperCase() ?? "GET") as string;
@@ -68,11 +72,19 @@ export async function apiFetch<T = unknown>(
     }
 
     if (refreshed) {
+      // Re-read CSRF token after refresh — the server may have rotated it
+      const freshCsrfToken = useCsrfStore.getState().token;
+      const retryHeaders: Record<string, string> = {
+        "Content-Type": "application/json",
+        ...(isMutation && freshCsrfToken ? { "x-csrf-token": freshCsrfToken } : {}),
+        ...(options.headers as Record<string, string> | undefined),
+      };
+
       // Retry original request once with fresh cookies
       const retryResponse = await fetch(`${API_URL}${url}`, {
         ...options,
         credentials: "include",
-        headers,
+        headers: retryHeaders,
       });
 
       if (!retryResponse.ok) {
@@ -90,6 +102,9 @@ export async function apiFetch<T = unknown>(
 
       return retryResponse.json() as Promise<T>;
     } else {
+      if (options.noRedirect) {
+        throw new AppError("UNAUTHORIZED", 401, "Non authentifié");
+      }
       // Refresh failed — clear state and redirect
       useCsrfStore.getState().clearToken();
       const { getQueryClient } = await import("@/lib/query/client");

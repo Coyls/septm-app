@@ -29,22 +29,17 @@ export default function SignUpPage() {
 
   const form = useForm<SignUpSchema>({
     resolver: zodResolver(signUpSchema),
-    defaultValues: { email: "", password: "", confirmPassword: "" },
+    defaultValues: { name: "", email: "", password: "", confirmPassword: "" },
   });
 
   function onSubmit(data: SignUpSchema) {
     setError(null);
     signUp(
-      { email: data.email, password: data.password },
+      { name: data.name, email: data.email, password: data.password },
       {
         onError: (err) => {
-          if (err instanceof AppError && err.status === 429) {
-            setError(
-              "Trop de tentatives. Veuillez patienter avant de réessayer.",
-            );
-          } else {
-            setError("Une erreur est survenue. Veuillez réessayer.");
-          }
+          if (err instanceof AppError && err.status === 429) return;
+          setError("Une erreur est survenue. Veuillez réessayer.");
         },
       },
     );
@@ -68,6 +63,24 @@ export default function SignUpPage() {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nom</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Prénom ou pseudo"
+                      autoComplete="name"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="email"
@@ -171,6 +184,18 @@ export default function SignUpPage() {
           >
             Se connecter
           </Link>
+        </p>
+
+        <p className="text-center text-xs text-muted-foreground">
+          En vous inscrivant, vous acceptez nos{" "}
+          <Link href="/terms" className="hover:underline">
+            conditions d&apos;utilisation
+          </Link>{" "}
+          et notre{" "}
+          <Link href="/privacy" className="hover:underline">
+            politique de confidentialité
+          </Link>
+          .
         </p>
       </CardContent>
     </Card>

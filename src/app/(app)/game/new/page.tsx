@@ -1,19 +1,18 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import { WizardStepIndicator } from "./_components/WizardStepIndicator"
-import { ExtensionStep } from "./_components/ExtensionStep"
-import { PlayerStep } from "./_components/PlayerStep"
-import { ConfirmationStep } from "./_components/ConfirmationStep"
-import { useGameWizardStore } from "@/stores/game-wizard.store"
+import { useGameWizardStore } from "@/stores/game-wizard.store";
+import { useEffect } from "react";
+import { ConfirmationStep } from "./_components/confirmation-step";
+import { ExtensionStep } from "./_components/extension-step";
+import { PlayerStep } from "./_components/player-step";
+import { WizardStepIndicator } from "./_components/wizard-step-indicator";
 
 export default function NewGamePage() {
-  const { step } = useGameWizardStore()
+  const { step } = useGameWizardStore();
 
-  // Rehydrate sessionStorage persistence on client mount
   useEffect(() => {
-    useGameWizardStore.persist.rehydrate()
-  }, [])
+    useGameWizardStore.persist.rehydrate();
+  }, []);
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -24,5 +23,5 @@ export default function NewGamePage() {
       {step === 2 && <PlayerStep />}
       {step === 3 && <ConfirmationStep />}
     </div>
-  )
+  );
 }

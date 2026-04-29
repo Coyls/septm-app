@@ -2,6 +2,7 @@
 
 import { createGame, submitScore } from "@/lib/api/game";
 import type { CreateGameBody, UpsertGameScoreBody } from "@/lib/types";
+import { AppError } from "@/lib/types";
 import { useGameWizardStore } from "@/stores/game-wizard.store";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -10,14 +11,17 @@ import { toast } from "sonner";
 export function useCreateGame() {
   const router = useRouter();
   const setCreatedGameId = useGameWizardStore((s) => s.setCreatedGameId);
+  const setBackendPlayerIds = useGameWizardStore((s) => s.setBackendPlayerIds);
 
   return useMutation({
     mutationFn: (body: CreateGameBody) => createGame(body),
     onSuccess: (data) => {
       setCreatedGameId(data.id);
+      setBackendPlayerIds(data.players);
       router.push(`/game/${data.id}/score`);
     },
-    onError: () => {
+    onError: (err) => {
+      if (err instanceof AppError && err.status === 429) return;
       toast.error("Erreur lors de la création de la partie");
     },
   });
@@ -34,7 +38,8 @@ export function useSubmitScore(gameId: string) {
       toast.success("Partie enregistrée !");
       router.push("/statistics/me");
     },
-    onError: () => {
+    onError: (err) => {
+      if (err instanceof AppError && err.status === 429) return;
       toast.error("Erreur lors de l'enregistrement des scores");
     },
   });

@@ -9,6 +9,7 @@ export type SignInSchema = z.infer<typeof signInSchema>;
 
 export const signUpSchema = z
   .object({
+    name: z.string().min(1, "Nom requis"),
     email: z.email("Email invalide"),
     password: z.string().min(8, "Minimum 8 caractères"),
     confirmPassword: z.string(),
@@ -19,3 +20,21 @@ export const signUpSchema = z
   });
 
 export type SignUpSchema = z.infer<typeof signUpSchema>;
+
+export const forgotPasswordSchema = z.object({
+  email: z.email("Email invalide"),
+});
+
+export type ForgotPasswordSchema = z.infer<typeof forgotPasswordSchema>;
+
+export const resetPasswordSchema = z
+  .object({
+    password: z.string().min(8, "Minimum 8 caractères"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Les mots de passe ne correspondent pas",
+    path: ["confirmPassword"],
+  });
+
+export type ResetPasswordSchema = z.infer<typeof resetPasswordSchema>;

@@ -1,36 +1,92 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SEPTM — 7 Wonders Score Tracker
 
-## Getting Started
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
-First, run the development server:
+**SEPTM** is a free, open-source score tracker for the board game *7 Wonders*. Track your games, review stats, and manage your circle of players.
+
+→ **Backend repository:** [septm-backend](https://github.com/Coyls/septm-backend)
+
+---
+
+## Features
+
+- Game creation with player selection and extension support
+- Detailed score entry and history
+- Personal and global statistics
+- Friends system
+- Light / dark mode
+
+## Tech stack
+
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 16 (App Router) |
+| UI | React 19, Tailwind CSS 4, shadcn/ui |
+| State / data fetching | TanStack Query v5, Zustand |
+| Forms | React Hook Form + Zod |
+| Charts | Recharts |
+| Language | TypeScript |
+
+The frontend proxies all `/api/v1/*` requests to the backend via Next.js rewrites — no CORS configuration required in development.
+
+## Prerequisites
+
+- Node.js 20+
+- pnpm
+- A running instance of [septm-backend](https://github.com/Coyls/septm-backend)
+
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+# 1. Clone the repo
+git clone https://github.com/Coyls/septm-app.git
+cd septm-app
+
+# 2. Install dependencies
+pnpm install
+
+# 3. Configure environment
+cp .env.example .env.local
+# Edit .env.local — set API_INTERNAL_URL to point at your backend instance
+
+# 4. Start the dev server (port 3001)
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3001](http://localhost:3001).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variable | Description | Default |
+|---|---|---|
+| `NEXT_PUBLIC_API_URL` | API base URL used by the browser | `/api/v1` |
+| `API_INTERNAL_URL` | API base URL used by the Next.js proxy (server-side) | `http://localhost:3000/api/v1` |
 
-## Learn More
+> `NEXT_PUBLIC_API_URL` should stay at `/api/v1` in most setups — the proxy handles routing to the actual backend.
 
-To learn more about Next.js, take a look at the following resources:
+## Project structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+src/
+├── app/
+│   ├── (public)/        # Landing, statistics, auth pages
+│   └── (app)/           # Authenticated pages (dashboard, game, friends…)
+├── components/          # Shared UI components
+├── lib/
+│   ├── api/             # API fetch helpers
+│   └── query/           # TanStack Query hooks
+└── stores/              # Zustand stores
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Contributing
 
-## Deploy on Vercel
+Contributions are welcome. Please open an issue before submitting a large PR so we can align on direction.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Fork the repo
+2. Create a branch: `git checkout -b feat/your-feature`
+3. Commit your changes
+4. Open a pull request
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## License
+
+MIT — see [LICENSE](./LICENSE) for details.

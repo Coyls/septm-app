@@ -17,6 +17,7 @@ import type {
   SendFriendRequestBody,
   SentRequest,
 } from "@/lib/types";
+import { AppError } from "@/lib/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -50,6 +51,10 @@ export function useSendFriendRequest() {
       queryClient.invalidateQueries({ queryKey: queryKeys.friends.sent() });
       toast.success("Demande d'ami envoyée !");
     },
+    onError: (err) => {
+      if (err instanceof AppError && err.status === 429) return;
+      toast.error("Impossible d'envoyer la demande d'ami");
+    },
   });
 }
 
@@ -71,8 +76,10 @@ export function useAcceptRequest() {
       );
       return { previous };
     },
-    onError: (_, __, context) => {
+    onError: (err, _, context) => {
       queryClient.setQueryData(queryKeys.friends.received(), context?.previous);
+      if (err instanceof AppError && err.status === 429) return;
+      toast.error("Impossible d'accepter la demande");
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.friends.received() });
@@ -102,8 +109,10 @@ export function useRejectRequest() {
       );
       return { previous };
     },
-    onError: (_, __, context) => {
+    onError: (err, _, context) => {
       queryClient.setQueryData(queryKeys.friends.received(), context?.previous);
+      if (err instanceof AppError && err.status === 429) return;
+      toast.error("Impossible de refuser la demande");
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.friends.received() });
@@ -127,8 +136,10 @@ export function useCancelRequest() {
       );
       return { previous };
     },
-    onError: (_, __, context) => {
+    onError: (err, _, context) => {
       queryClient.setQueryData(queryKeys.friends.sent(), context?.previous);
+      if (err instanceof AppError && err.status === 429) return;
+      toast.error("Impossible d'annuler la demande");
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.friends.sent() });
@@ -152,8 +163,9 @@ export function useRemoveFriend() {
       );
       return { previous };
     },
-    onError: (_, __, context) => {
+    onError: (err, _, context) => {
       queryClient.setQueryData(queryKeys.friends.list(), context?.previous);
+      if (err instanceof AppError && err.status === 429) return;
       toast.error("Impossible de retirer cet ami");
     },
     onSettled: () => {

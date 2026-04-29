@@ -1,5 +1,10 @@
-import { DashboardContent } from "./_components/DashboardContent"
+import { Suspense } from "react";
+import { DashboardContent } from "./_components/dashboard-content";
 
 export default function DashboardPage() {
-  return <DashboardContent />
+  return (
+    <Suspense fallback={null}>
+      <DashboardContent />
+    </Suspense>
+  );
 }

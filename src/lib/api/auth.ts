@@ -5,6 +5,10 @@ export function getMe(): Promise<{ user: AuthUser }> {
   return apiFetch("/auth/me");
 }
 
+export function getMePublic(): Promise<{ user: AuthUser }> {
+  return apiFetch("/auth/me", { noRedirect: true });
+}
+
 export function signIn(body: SignInBody): Promise<{ userId: string }> {
   return apiFetch("/auth/signin", {
     method: "POST",
@@ -29,4 +33,29 @@ export function signOut(): Promise<true> {
 
 export function getCsrfToken(): Promise<{ csrfToken: string }> {
   return apiFetch("/csrf");
+}
+
+export function verifyEmail(token: string): Promise<{ success: boolean }> {
+  return apiFetch(`/auth/verify-email?token=${encodeURIComponent(token)}`);
+}
+
+export function resendVerification(): Promise<{ success: true }> {
+  return apiFetch("/auth/resend-verification", { method: "POST" });
+}
+
+export function forgotPassword(email: string): Promise<{ success: true }> {
+  return apiFetch("/auth/forgot-password", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+}
+
+export function resetPassword(
+  token: string,
+  password: string,
+): Promise<{ success: boolean }> {
+  return apiFetch("/auth/reset-password", {
+    method: "POST",
+    body: JSON.stringify({ token, password }),
+  });
 }
