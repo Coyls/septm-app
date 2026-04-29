@@ -1,13 +1,45 @@
 "use client";
 
-import { Competitiveness } from "@/components/statistics/charts/competitiveness";
+import dynamic from "next/dynamic";
 import { ExtensionImpact } from "@/components/statistics/charts/extension-impact";
-import { MonthlyTrend } from "@/components/statistics/charts/monthly-trend";
-import { PointTypeDistribution } from "@/components/statistics/charts/point-type-distribution";
-import { ScoreDistribution } from "@/components/statistics/charts/score-distribution";
-import { SidePerformance } from "@/components/statistics/charts/side-performance";
 import { WonderPerformance } from "@/components/statistics/charts/wonder-performance";
 import { DateRangePicker } from "@/components/statistics/date-range-picker";
+
+const MonthlyTrend = dynamic(
+  () =>
+    import("@/components/statistics/charts/monthly-trend").then(
+      (m) => m.MonthlyTrend,
+    ),
+  { ssr: false },
+);
+const ScoreDistribution = dynamic(
+  () =>
+    import("@/components/statistics/charts/score-distribution").then(
+      (m) => m.ScoreDistribution,
+    ),
+  { ssr: false },
+);
+const SidePerformance = dynamic(
+  () =>
+    import("@/components/statistics/charts/side-performance").then(
+      (m) => m.SidePerformance,
+    ),
+  { ssr: false },
+);
+const PointTypeDistribution = dynamic(
+  () =>
+    import("@/components/statistics/charts/point-type-distribution").then(
+      (m) => m.PointTypeDistribution,
+    ),
+  { ssr: false },
+);
+const Competitiveness = dynamic(
+  () =>
+    import("@/components/statistics/charts/competitiveness").then(
+      (m) => m.Competitiveness,
+    ),
+  { ssr: false },
+);
 import { StatCard } from "@/components/statistics/stat-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGlobalStats } from "@/lib/query/hooks/useStatistics";
