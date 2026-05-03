@@ -31,7 +31,11 @@ function waitForRefresh(): Promise<boolean> {
 
 function redirectToSignIn(): never {
   if (typeof window !== "undefined") {
-    window.location.href = "/auth/signin";
+    const { pathname } = window.location;
+    const target = pathname.startsWith("/auth/")
+      ? "/auth/signin"
+      : `/auth/signin?redirect=${encodeURIComponent(pathname)}`;
+    window.location.href = target;
   }
   throw new AppError("UNAUTHORIZED", 401, "Non authentifié");
 }

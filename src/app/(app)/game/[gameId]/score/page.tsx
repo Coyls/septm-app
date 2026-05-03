@@ -6,12 +6,17 @@ import type { ExtensionId, PointTypeId } from "@/lib/types";
 import { AppError, EXTENSION_POINT_TYPES, POINT_TYPE_META } from "@/lib/types";
 import { calculatePlayerTotal, getErrorMessage } from "@/lib/utils";
 import { useGameWizardStore } from "@/stores/game-wizard.store";
-import { use, useEffect, useState } from "react";
+import { use, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { LiveLeaderboard } from "./_components/live-leaderboard";
 import { ScorePageHeader } from "./_components/score-page-header";
 import { ScoreTable } from "./_components/score-table";
 import type { PlayerScoreState } from "./_components/types";
+
+type PlayerOverrides = {
+  coins?: number;
+  points?: Partial<Record<PointTypeId, number>>;
+};
 
 export default function ScorePage({
   params,
@@ -40,29 +45,44 @@ export default function ScorePage({
     return options?.wonders.find((w) => w.id === wonderId)?.name ?? wonderId;
   }
 
-  const [scores, setScores] = useState<PlayerScoreState[]>([]);
-
   useEffect(() => {
     useGameWizardStore.persist.rehydrate();
   }, []);
 
-  useEffect(() => {
-    if (players.length > 0 && scores.length === 0) {
-      setScores(
-        players.map((p) => ({
-          playerId: p.backendPlayerId ?? p.id,
-          playerName: p.name,
-          wonderName: getWonderName(p.wonderId ?? ""),
-          wonderSide: p.wonderSide,
-          coins: 0,
-          points: Object.fromEntries(
-            pointRows.map((pt) => [pt.id, 0]),
-          ) as Record<PointTypeId, number>,
-        })),
-      );
-    }
+  // Base scores derived from players + options — no initialization effect needed
+  const baseScores = useMemo<PlayerScoreState[]>(() => {
+    if (players.length === 0) return [];
+    return players.map((p) => ({
+      playerId: p.backendPlayerId ?? p.id,
+      playerName: p.name,
+      wonderName: getWonderName(p.wonderId ?? ""),
+      wonderSide: p.wonderSide,
+      coins: 0,
+      points: Object.fromEntries(
+        pointRows.map((pt) => [pt.id, 0]),
+      ) as Record<PointTypeId, number>,
+    }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [players, options]);
+
+  // User edits keyed by playerId, merged over baseScores at render time
+  const [overrides, setOverrides] = useState<Record<string, PlayerOverrides>>(
+    {},
+  );
+
+  const scores = useMemo(
+    () =>
+      baseScores.map((s) => {
+        const o = overrides[s.playerId];
+        if (!o) return s;
+        return {
+          ...s,
+          ...(o.coins !== undefined ? { coins: o.coins } : {}),
+          ...(o.points ? { points: { ...s.points, ...o.points } } : {}),
+        };
+      }),
+    [baseScores, overrides],
+  );
 
   function handleChange(
     playerId: string,
@@ -71,13 +91,19 @@ export default function ScorePage({
   ) {
     const value = raw === "" ? 0 : parseInt(raw, 10);
     if (isNaN(value)) return;
-    setScores((prev) =>
-      prev.map((p) => {
-        if (p.playerId !== playerId) return p;
-        if (field === "coins") return { ...p, coins: value };
-        return { ...p, points: { ...p.points, [field]: value } };
-      }),
-    );
+    setOverrides((prev) => {
+      const existing = prev[playerId] ?? {};
+      if (field === "coins") {
+        return { ...prev, [playerId]: { ...existing, coins: value } };
+      }
+      return {
+        ...prev,
+        [playerId]: {
+          ...existing,
+          points: { ...(existing.points ?? {}), [field]: value },
+        },
+      };
+    });
   }
 
   const sorted = [...scores].sort(
@@ -120,7 +146,11 @@ export default function ScorePage({
       <ScorePageHeader
         gameId={gameId}
         isPending={isPending}
-        disabled={scores.length === 0 || isPending || !scores.every((s) => s.coins >= 0)}
+        disabled={
+          scores.length === 0 ||
+          isPending ||
+          !scores.every((s) => s.coins >= 0)
+        }
         onSubmit={handleSubmit}
       />
       <LiveLeaderboard sorted={sorted} gap={gap} />
