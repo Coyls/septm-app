@@ -1,7 +1,8 @@
 import Link from "next/link";
 
 const LINKS = [
-  { href: "/statistics", label: "Statistiques" },
+  { href: "/statistics", label: "Statistiques Global" },
+  { href: "/science-calculator", label: "Calculateur Scientifique" },
   { href: "/auth/signin", label: "Connexion" },
   { href: "/auth/signup", label: "Inscription" },
   { href: "/terms", label: "CGU" },
