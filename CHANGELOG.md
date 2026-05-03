@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Scientific calculator for Seven Wonders: computes the optimal score from wheel, compass, and tablet counts with joker distribution using an O(j²) algorithm
+- Accessible publicly at `/science-calculator` (public nav) and within the app at `/tools/science-calculator` (sidebar)
+- Rename links public navbar and footer (Stats -> Statistiques Global)
+
 ## [1.0.1] - 2026-04-30
 
 ### Hotfix

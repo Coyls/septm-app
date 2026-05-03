@@ -25,7 +25,16 @@ export function PublicNav() {
             "text-xs tracking-widest uppercase hidden sm:inline-flex",
           )}
         >
-          Stats
+          Statistiques Global
+        </Link>
+        <Link
+          href="/science-calculator"
+          className={cn(
+            buttonVariants({ variant: "ghost", size: "sm" }),
+            "text-xs tracking-widest uppercase hidden sm:inline-flex",
+          )}
+        >
+          Calculateur Scientifique
         </Link>
         {!isLoading &&
           (data ? (

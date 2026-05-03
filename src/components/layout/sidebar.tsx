@@ -16,6 +16,7 @@ import { useReceivedRequests } from "@/lib/query/hooks/useFriends";
 import { cn } from "@/lib/utils";
 import {
   BarChart2,
+  Calculator,
   ChevronsUpDown,
   LayoutDashboard,
   LogOut,
@@ -36,6 +37,7 @@ const navItems = [
   },
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/statistics/me", label: "Mes statistiques", icon: BarChart2 },
+  { href: "/tools/science-calculator", label: "Calculateur science", icon: Calculator },
 ];
 
 function getInitial(name?: string | null): string {

@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 // No auth check — always accessible
-const OPEN_PATHS = ["/", "/statistics", "/privacy", "/terms"];
+const OPEN_PATHS = ["/", "/statistics", "/science-calculator", "/privacy", "/terms"];
 
 // Redirect to dashboard if already has a valid access_token
 const AUTH_PAGES = ["/auth/signin", "/auth/signup"];

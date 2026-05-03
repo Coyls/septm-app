@@ -51,6 +51,15 @@ Responsibilities:
 
 The middleware only checks cookie **presence**, not validity. Actual token validation happens client-side in `apiFetch`.
 
+> **OPEN_PATHS — mandatory step for public pages**
+>
+> `(public)/` routes are **not** automatically open. The middleware falls through to the protected-page check unless the path is listed in `OPEN_PATHS`. Any new public page added under `(public)/` **must** also be added to `OPEN_PATHS` in `src/proxy.ts`, otherwise unauthenticated visitors will be redirected to `/auth/signin`.
+>
+> Example: adding `src/app/(public)/science-calculator/page.tsx` requires:
+> ```ts
+> const OPEN_PATHS = ["/", "/statistics", "/science-calculator", "/privacy", "/terms"];
+> ```
+
 ---
 
 ## Authentication flow
@@ -165,8 +174,9 @@ Sentry is integrated via `@sentry/nextjs`:
 When adding a new feature:
 
 1. Add the route in the appropriate group (`(public)/` or `(app)/`).
-2. Create `_components/` for page-local components.
-3. Add a raw API function in `src/lib/api/<domain>.ts`.
-4. Add query keys in `src/lib/query/keys.ts`.
-5. Add hooks in `src/lib/query/hooks/use<Domain>.ts`.
-6. If the decision is **hard to reverse or structuring**, capture it in an ADR under `docs/adr/`.
+2. **If the route is public**: add its path to `OPEN_PATHS` in `src/proxy.ts`. Skipping this step redirects unauthenticated users to `/auth/signin`.
+3. Create `_components/` for page-local components.
+4. Add a raw API function in `src/lib/api/<domain>.ts`.
+5. Add query keys in `src/lib/query/keys.ts`.
+6. Add hooks in `src/lib/query/hooks/use<Domain>.ts`.
+7. If the decision is **hard to reverse or structuring**, capture it in an ADR under `docs/adr/`.
